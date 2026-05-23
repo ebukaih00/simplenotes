@@ -1,0 +1,3348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Notes</title>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Cream/Beige Theme variables */
+      --bg-editor: #FAF9F5;
+      --bg-sidebar: #EFEFEA;
+      --bg-hover: #E5E5DE;
+      --bg-active: #DADAD2;
+      --color-text: #242220;
+      --color-text-muted: #7E7972;
+      --color-accent: #E2871A; /* Warm amber/orange cursor */
+      --color-accent-rgb: 226, 135, 26;
+      --border-color: #E2E2D9;
+      --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      --transition-speed: 0.2s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-editor);
+      color: var(--color-text);
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* --- TOP HEADER ROW --- */
+    .app-header {
+      height: 48px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-sidebar);
+      padding: 0 16px;
+      user-select: none;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 204px; /* Matches expanded sidebar width minus padding */
+      transition: width var(--transition-speed) ease;
+      overflow: hidden;
+    }
+
+    .app-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text);
+      cursor: pointer;
+    }
+
+    .app-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .header-tabs {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      height: 100%;
+      overflow-x: auto;
+      scrollbar-width: none; /* Hide scrollbar for Firefox */
+      gap: 4px;
+      padding-top: 6px;
+    }
+
+    .header-tabs::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome/Safari */
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background-color: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      max-width: 150px;
+      transition: all var(--transition-speed) ease;
+      position: relative;
+      bottom: -1px;
+    }
+
+    .tab.active {
+      background-color: var(--bg-editor);
+      color: var(--color-text);
+      font-weight: 600;
+      border-color: var(--border-color);
+      border-bottom: 1px solid var(--bg-editor);
+      z-index: 2;
+    }
+
+    .tab-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      color: var(--color-text-muted);
+      transition: background var(--transition-speed);
+    }
+
+    .tab-close:hover {
+      background-color: var(--bg-active);
+      color: var(--color-text);
+    }
+
+    .tab-add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: background var(--transition-speed);
+      margin-bottom: 4px;
+      margin-left: 4px;
+    }
+
+    .tab-add:hover {
+      background-color: var(--bg-hover);
+      color: var(--color-text);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 12px;
+    }
+
+    .control-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all var(--transition-speed);
+    }
+
+    .control-btn:hover {
+      background-color: var(--bg-hover);
+      color: var(--color-text);
+    }
+
+    /* --- MAIN CONTENT LAYOUT --- */
+    .app-main {
+      flex: 1;
+      display: flex;
+      position: relative;
+      height: calc(100% - 48px);
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 220px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      justify-content: space-between;
+      transition: width var(--transition-speed) ease;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .sidebar-top {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .sidebar-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background var(--transition-speed);
+    }
+
+    .sidebar-action-btn:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 12px 10px 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-editor);
+      font-size: 13px;
+      color: var(--color-text);
+      outline: none;
+      transition: border var(--transition-speed);
+    }
+
+    .search-input:focus {
+      border-color: var(--color-accent);
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 4px 0;
+    }
+
+    /* Notes List */
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 4px;
+    }
+
+    .note-item {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+      position: relative;
+      group: true;
+    }
+
+    .note-item:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .note-item.active {
+      background-color: var(--bg-active);
+    }
+
+    .note-item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .note-item-time {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    .note-item-delete {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      transition: opacity 0.15s, background var(--transition-speed);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .note-item:hover .note-item-delete {
+      opacity: 1;
+    }
+
+    .note-item-delete:hover {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: #DC2626;
+    }
+
+    .empty-search-state {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    /* Sidebar Bottom menu options */
+    .sidebar-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      margin-top: 8px;
+      position: relative;
+    }
+
+    .popover-container {
+      position: relative;
+    }
+
+    .popover-menu {
+      position: absolute;
+      bottom: 40px;
+      left: 0;
+      width: 196px;
+      background-color: var(--bg-editor);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      flex-direction: column;
+      padding: 6px;
+      z-index: 100;
+      animation: popoverFade 0.15s ease-out;
+    }
+
+    @keyframes popoverFade {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .popover-menu.show {
+      display: flex;
+    }
+
+    .popover-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text);
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      transition: background var(--transition-speed);
+    }
+
+    .popover-item:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .popover-shortcut {
+      color: var(--color-text-muted);
+      font-size: 10px;
+    }
+
+    /* --- EDITOR AREA --- */
+    .editor-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background-color: var(--bg-editor);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-textarea {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: transparent;
+      padding: 56px 24px 90px 24px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-text);
+      outline: none;
+      caret-color: var(--color-accent);
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .editor-textarea:empty::before {
+      content: attr(placeholder);
+      color: var(--color-text-muted);
+      cursor: text;
+      pointer-events: none;
+    }
+
+    /* Floating Formatting Bar */
+    .formatting-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      border-radius: 24px;
+      background-color: #1C1917; /* Dark stone/charcoal matching copy button */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      transition: opacity var(--transition-speed), transform var(--transition-speed);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: none;
+    }
+    
+    .formatting-bar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      color: #D6D3D1; /* Lighter warm stone text */
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+    }
+
+    .formatting-bar-btn:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #FAF9F5;
+    }
+
+    .formatting-bar-btn:active {
+      transform: scale(0.9);
+    }
+
+    .formatting-bar-divider {
+      width: 1px;
+      height: 18px;
+      background-color: rgba(255, 255, 255, 0.15);
+      margin: 0 4px;
+    }
+
+    /* Click to Jump Tooltip */
+    .link-tooltip {
+      position: absolute;
+      background-color: #1C1917; /* Dark stone/charcoal to match formatting bar */
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      z-index: 1001;
+      pointer-events: auto;
+    }
+
+    .link-tooltip-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #D6D3D1;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      white-space: nowrap;
+      transition: all var(--transition-speed);
+    }
+
+    .link-tooltip-btn:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #FAF9F5;
+    }
+
+    .link-tooltip-divider {
+      width: 1px;
+      height: 14px;
+      background-color: rgba(255, 255, 255, 0.15);
+      margin: 0 2px;
+    }
+
+    /* Floaty Copy Button */
+    .copy-btn {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 20px;
+      background-color: #1C1917; /* Dark stone */
+      color: #FAF9F5;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      z-index: 10;
+    }
+
+    .copy-btn:hover {
+      background-color: #2D2A26;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .copy-btn:active {
+      transform: translateY(0);
+    }
+
+    .copy-btn.copied {
+      background-color: #16A34A; /* Green success */
+    }
+
+    /* --- COLLAPSED STATE STYLING --- */
+    .sidebar-collapsed .sidebar {
+      width: 58px;
+      padding: 12px 8px;
+      align-items: center;
+    }
+
+    .sidebar-collapsed .header-left {
+      width: 42px;
+    }
+
+    .sidebar-collapsed .sidebar-action-btn {
+      justify-content: center;
+      padding: 10px 0;
+    }
+
+    .sidebar-collapsed .sidebar-action-btn span:not(.icon) {
+      display: none;
+    }
+
+    .sidebar-collapsed .search-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .sidebar-collapsed .search-input {
+      display: none;
+    }
+
+    .sidebar-collapsed .search-icon {
+      position: static;
+      transform: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition-speed);
+    }
+
+    .sidebar-collapsed .search-icon:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .sidebar-collapsed .note-item {
+      align-items: center;
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .sidebar-collapsed .note-item-title,
+    .sidebar-collapsed .note-item-time,
+    .sidebar-collapsed .note-item-delete {
+      display: none;
+    }
+
+    .sidebar-collapsed .note-item::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-text-muted);
+      transition: background var(--transition-speed);
+    }
+
+    .sidebar-collapsed .note-item.active::after {
+      background-color: var(--color-accent);
+      transform: scale(1.2);
+    }
+
+    .sidebar-collapsed .sidebar-bottom {
+      align-items: center;
+    }
+
+    .sidebar-collapsed .popover-menu {
+      left: 48px;
+      bottom: 0;
+    }
+
+    /* Scrollbar styles for list and editor */
+    .notes-list::-webkit-scrollbar,
+    .editor-textarea::-webkit-scrollbar {
+      width: 6px;
+    }
+    .notes-list::-webkit-scrollbar-track,
+    .editor-textarea::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .notes-list::-webkit-scrollbar-thumb,
+    .editor-textarea::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 10px;
+    }
+    .notes-list::-webkit-scrollbar-thumb:hover,
+    .editor-textarea::-webkit-scrollbar-thumb:hover {
+      background-color: var(--bg-hover);
+    }
+
+    /* Autocomplete dropdown styles */
+    .autocomplete-dropdown {
+      position: absolute;
+      background-color: var(--bg-editor);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      max-height: 180px;
+      width: 200px;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      padding: 4px;
+    }
+    .autocomplete-item {
+      padding: 6px 10px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--color-text);
+      transition: background var(--transition-speed);
+      text-align: left;
+      border: none;
+      background: transparent;
+      width: 100%;
+    }
+    .autocomplete-item:hover, .autocomplete-item.selected {
+      background-color: var(--bg-hover);
+      outline: none;
+    }
+
+    /* --- ATTACHMENT WIDGET --- */
+    .attachment-widget {
+      position: absolute;
+      top: 14px;
+      right: 24px;
+      z-index: 20;
+      font-family: inherit;
+    }
+    .attachment-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      background-color: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      outline: none;
+    }
+    .attachment-btn:hover {
+      color: var(--color-text);
+      border-color: var(--color-accent);
+      background-color: var(--bg-card);
+    }
+    .attachment-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #FAF9F5;
+      background-color: #1C1917; /* Dark stone matching theme */
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      transition: all var(--transition-speed);
+      box-shadow: var(--shadow-sm);
+    }
+    .attachment-badge-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 6px;
+      padding-left: 6px;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .attachment-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      color: #D6D3D1;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+    }
+    .attachment-action-btn:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #FAF9F5;
+    }
+    
+    /* Attachment Dropdown */
+    .attachment-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      max-height: 220px;
+      width: 220px;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      padding: 4px;
+    }
+    .attachment-dropdown-search {
+      padding: 4px 6px;
+      margin-bottom: 4px;
+      background-color: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--color-text);
+      outline: none;
+      width: calc(100% - 12px);
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .attachment-dropdown-item {
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--color-text);
+      transition: background var(--transition-speed);
+      text-align: left;
+      border: none;
+      background: transparent;
+      width: 100%;
+    }
+    .attachment-dropdown-item:hover {
+      background-color: var(--bg-hover);
+      outline: none;
+    }
+    .attachment-dropdown-empty {
+      padding: 12px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    /* --- TABLE WIZARD POPOVER --- */
+    .table-wizard {
+      position: absolute;
+      bottom: 74px; /* above formatting bar */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #1C1917; /* Dark stone to match formatting bar */
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      color: #FAF9F5;
+      width: 170px;
+      user-select: none;
+    }
+    
+    .table-wizard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #A8A29E;
+    }
+    
+    .table-wizard-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      margin: 4px 0;
+    }
+    
+    .table-wizard-cell {
+      width: 24px;
+      height: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .table-wizard-cell.highlighted {
+      background-color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    
+    .table-wizard-custom {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+    
+    .table-wizard-input {
+      width: 32px;
+      height: 20px;
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      color: #FAF9F5;
+      text-align: center;
+      font-size: 10px;
+      outline: none;
+    }
+    
+    .table-wizard-input:focus {
+      border-color: var(--color-accent);
+    }
+    
+    .table-wizard-btn {
+      flex: 1;
+      height: 20px;
+      background-color: var(--color-accent);
+      color: #FAF9F5;
+      border: none;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity var(--transition-speed);
+    }
+    
+    .table-wizard-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* --- EDITOR MODE TOGGLE STYLE --- */
+    .editor-mode-toggle {
+      position: absolute;
+      top: 14px;
+      left: 24px;
+      z-index: 20;
+      display: flex;
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      outline: none;
+    }
+    .toggle-btn:hover {
+      color: var(--color-text);
+    }
+    .toggle-btn.active {
+      background-color: var(--bg-editor);
+      color: var(--color-text);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* --- EDITOR RICH TEXT ELEMENTS --- */
+    .editor-textarea h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      color: var(--color-text);
+    }
+    .editor-textarea h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: var(--color-text);
+    }
+    .editor-textarea p {
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .editor-textarea ul, .editor-textarea ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    .editor-textarea li {
+      margin-bottom: 4px;
+    }
+    .editor-textarea blockquote {
+      border-left: 4px solid var(--color-accent);
+      padding-left: 12px;
+      color: var(--color-text-muted);
+      margin: 12px 0;
+      font-style: italic;
+    }
+    .editor-textarea code {
+      font-family: monospace;
+      background-color: var(--bg-sidebar);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+    .editor-textarea a {
+      color: var(--color-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .editor-textarea a:hover {
+      text-decoration: underline;
+    }
+    .editor-textarea a.frame-link {
+      background-color: rgba(226, 135, 26, 0.08);
+      border: 1px solid rgba(226, 135, 26, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12.5px;
+      transition: all var(--transition-speed);
+    }
+    .editor-textarea a.frame-link:hover {
+      background-color: rgba(226, 135, 26, 0.15);
+      text-decoration: none;
+    }
+    .editor-textarea a.frame-link::before {
+      content: '📝';
+      font-size: 10px;
+    }
+    
+    /* Checklist styles */
+    .editor-textarea .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .editor-textarea .checklist-item input[type="checkbox"] {
+      accent-color: var(--color-accent);
+      cursor: pointer;
+    }
+
+    /* Table drag/action wrapper styling */
+    .editor-textarea .table-container {
+      position: relative;
+      margin: 16px 0;
+      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      background-color: var(--bg-sidebar);
+      transition: border-color var(--transition-speed);
+    }
+    .editor-textarea .table-container:hover {
+      border-color: var(--color-accent);
+    }
+    .editor-textarea .table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+      user-select: none;
+    }
+    .editor-textarea .table-tool-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background-color: var(--bg-editor);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: all var(--transition-speed);
+    }
+    .editor-textarea .table-tool-btn:hover {
+      background-color: var(--bg-hover);
+      color: var(--color-text);
+      border-color: var(--color-accent);
+    }
+    .editor-textarea .table-tool-btn.delete:hover {
+      background-color: #FEE2E2;
+      color: #EF4444;
+      border-color: #FCA5A5;
+    }
+    .editor-textarea .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    /* Table styling inside the editor itself */
+    .editor-textarea table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+      margin: 16px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+    }
+    .editor-textarea th {
+      background-color: #1C1917; /* Dark stone header */
+      color: #FAF9F5;
+      font-weight: 600;
+      padding: 10px 12px;
+      border: 1px solid #2D2A26;
+    }
+    .editor-textarea td {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      background-color: #FFFFFF;
+      color: var(--color-text);
+    }
+    .editor-textarea tr:nth-child(even) td {
+      background-color: #FAF9F5; /* alternating rows */
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="header-left" id="headerLeft">
+        <span class="app-logo" onclick="toggleSidebar()">
+          <!-- Custom bars logo -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M4 18V6M9 18V12M14 18V9M19 18V4"/>
+          </svg>
+        </span>
+        <span class="app-title">Simple Notes</span>
+      </div>
+
+      <!-- TABS -->
+      <div class="header-tabs" id="tabsContainer">
+        <!-- Tabs injected by JS -->
+      </div>
+      <div class="tab-add" onclick="createNewNote()" title="New note in new tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </div>
+
+      <!-- WINDOW CONTROLS -->
+      <div class="header-controls">
+        <button class="control-btn" id="resizeBtn" onclick="toggleWindowSize()" title="Toggle window size">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-main">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+          <!-- Collapse/Expand Sidebar Action -->
+          <button class="sidebar-action-btn" onclick="toggleSidebar()" title="Collapse Notes list">
+            <span class="icon" style="display: flex;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <line x1="9" y1="3" x2="9" y2="21"/>
+              </svg>
+            </span>
+            <span class="menu-text">Collapse Notes</span>
+          </button>
+
+          <!-- New Note Action -->
+          <button class="sidebar-action-btn" onclick="createNewNote()" title="Create new note">
+            <span class="icon" style="display: flex;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </span>
+            <span class="menu-text">New note</span>
+          </button>
+
+          <!-- Search Notes Box -->
+          <div class="search-wrapper">
+            <div class="search-icon" onclick="expandSidebarIfCollapsed()" title="Search notes">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search notes..." oninput="handleSearch()">
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <!-- Notes List Container -->
+          <div class="notes-list" id="notesList">
+            <!-- Notes list items injected by JS -->
+          </div>
+        </div>
+
+        <!-- Sidebar Bottom Menus -->
+        <div class="sidebar-bottom">
+          <!-- Transforms Popover -->
+          <div class="popover-container">
+            <button class="sidebar-action-btn" onclick="togglePopover('transformsMenu', event)" title="Transforms">
+              <span class="icon" style="display: flex;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 2 22 22 22"/>
+                  <path d="M12 2v20M2 22h20"/>
+                </svg>
+              </span>
+              <span class="menu-text">Transforms</span>
+            </button>
+            <div class="popover-menu" id="transformsMenu">
+              <button class="popover-item" onclick="insertIntoFigmaCanvas()">
+                <span>Insert to Canvas</span>
+                <span class="popover-shortcut">Figma</span>
+              </button>
+              <button class="popover-item" onclick="transformText('uppercase')">
+                <span>To UPPERCASE</span>
+              </button>
+              <button class="popover-item" onclick="transformText('lowercase')">
+                <span>To lowercase</span>
+              </button>
+              <button class="popover-item" onclick="transformText('titlecase')">
+                <span>To Title Case</span>
+              </button>
+              <button class="popover-item" onclick="transformText('clean')">
+                <span>Clean Whitespace</span>
+              </button>
+              <button class="popover-item" onclick="showStats()">
+                <span>Word Count...</span>
+              </button>
+              <div id="linkedFramesHeader" style="font-size: 11px; font-weight:600; color:var(--color-text-muted); padding:8px 10px 4px 10px; border-top: 1px solid var(--border-color); margin-top: 6px; display: none;">LINKED FRAMES</div>
+              <div id="linkedFramesContainer" style="display: flex; flex-direction: column; padding: 0 4px; max-height: 120px; overflow-y: auto;"></div>
+            </div>
+          </div>
+
+          <!-- Formatting Popover -->
+          <div class="popover-container">
+            <button class="sidebar-action-btn" onclick="togglePopover('formattingMenu', event)" title="Formatting">
+              <span class="icon" style="display: flex;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="4 7 4 4 20 4 20 7"/>
+                  <line x1="9" y1="20" x2="15" y2="20"/>
+                  <line x1="12" y1="4" x2="12" y2="20"/>
+                </svg>
+              </span>
+              <span class="menu-text">Formatting</span>
+            </button>
+             <div class="popover-menu" id="formattingMenu">
+               <button class="popover-item" onclick="applyFormat('bold')">
+                 <span>Bold</span>
+                 <span class="popover-shortcut">**text**</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('italic')">
+                 <span>Italic</span>
+                 <span class="popover-shortcut">*text*</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('strikethrough')">
+                 <span>Strikethrough</span>
+                 <span class="popover-shortcut">~~text~~</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('code')">
+                 <span>Code Block</span>
+                 <span class="popover-shortcut">`code`</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('h1')">
+                 <span>Header 1</span>
+                 <span class="popover-shortcut"># text</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('h2')">
+                 <span>Header 2</span>
+                 <span class="popover-shortcut">## text</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('bullet')">
+                 <span>Bullet List</span>
+                 <span class="popover-shortcut">- item</span>
+               </button>
+               <button class="popover-item" onclick="applyFormat('quote')">
+                 <span>Quote block</span>
+                 <span class="popover-shortcut">&gt; text</span>
+                </button>
+             </div>
+           </div>
+         </div>
+       </aside>
+       <main class="editor-container">
+        <div 
+          class="editor-textarea" 
+          id="editor" 
+          contenteditable="true"
+          placeholder="Start writing..." 
+          oninput="handleEditorInput()"
+        ></div>
+
+        <!-- Attachment Widget -->
+        <div class="attachment-widget" id="attachmentWidget">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Table Wizard Popover -->
+        <div class="table-wizard" id="tableWizard">
+          <div class="table-wizard-header">
+            <span>Insert Table</span>
+            <span id="tableWizardSize">3 x 2</span>
+          </div>
+          <div class="table-wizard-grid" id="tableWizardGrid">
+            <!-- 5x5 grid cells generated in JS -->
+          </div>
+          <div class="table-wizard-custom">
+            <input type="number" class="table-wizard-input" id="tableWizardRows" value="3" min="1" max="20" title="Rows">
+            <span style="font-size: 10px; color: #A8A29E;">x</span>
+            <input type="number" class="table-wizard-input" id="tableWizardCols" value="2" min="1" max="20" title="Columns">
+            <button class="table-wizard-btn" onclick="confirmInsertTableCustom()">Insert</button>
+          </div>
+        </div>
+
+        <!-- Autocomplete dropdown -->
+        <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+
+        <!-- Floaty Copy Button -->
+        <button class="copy-btn" id="copyBtn" onclick="copyNoteContent()">
+          <span id="copyIcon" style="display: flex;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </span>
+          <span id="copyText">Copy</span>
+        </button>
+
+        <!-- Floating Link Click-to-Jump Tooltip -->
+        <div class="link-tooltip" id="linkTooltip">
+          <button class="link-tooltip-btn" id="tooltipJumpBtn" title="Jump to Frame in Canvas">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 0 0-10 10c0 5.25 10 12 10 12s10-6.75 10-12a10 10 0 0 0-10-10z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span>Jump to Frame</span>
+          </button>
+          <div class="link-tooltip-divider"></div>
+          <button class="link-tooltip-btn" id="tooltipOpenBtn" title="Open URL in Browser">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            <span>Open URL</span>
+          </button>
+        </div>
+
+        <!-- Floating Formatting Bar -->
+        <div class="formatting-bar" id="formattingBar">
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('bold')" title="Bold (Ctrl+B)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+              <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+            </svg>
+          </button>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('italic')" title="Italic (Ctrl+I)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="4" x2="10" y2="4"/>
+              <line x1="14" y1="20" x2="5" y2="20"/>
+              <line x1="15" y1="4" x2="9" y2="20"/>
+            </svg>
+          </button>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('underline')" title="Underline (Ctrl+U)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/>
+              <line x1="4" y1="21" x2="20" y2="21"/>
+            </svg>
+          </button>
+          <div class="formatting-bar-divider"></div>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('code')" title="Inline Code">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+          </button>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('link')" title="Insert Link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+          </button>
+          <div class="formatting-bar-divider"></div>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('bullet')" title="Bullet List">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="9" y1="6" x2="20" y2="6"/>
+              <line x1="9" y1="12" x2="20" y2="12"/>
+              <line x1="9" y1="18" x2="20" y2="18"/>
+              <line x1="5" y1="6" x2="5.01" y2="6"/>
+              <line x1="5" y1="12" x2="5.01" y2="12"/>
+              <line x1="5" y1="18" x2="5.01" y2="18"/>
+            </svg>
+          </button>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('number')" title="Numbered List">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="10" y1="6" x2="21" y2="6"/>
+              <line x1="10" y1="12" x2="21" y2="12"/>
+              <line x1="10" y1="18" x2="21" y2="18"/>
+              <path d="M4 6h1v4"/>
+              <path d="M4 10h2"/>
+              <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>
+            </svg>
+          </button>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('checkbox')" title="Checklist">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <path d="m9 11 3 3 5-5"/>
+            </svg>
+          </button>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('quote')" title="Blockquote">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+          <div class="formatting-bar-divider"></div>
+          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('table')" title="Insert Table">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M21 9H3M21 15H3M12 3v18"/>
+            </svg>
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Plugin State
+    let notes = [];
+    let activeNoteId = null;
+    let openTabIds = []; // Tabs that are currently open in the tab bar
+    let isSidebarCollapsed = false;
+    let isWindowLarge = false;
+    let searchFilter = '';
+    let saveTimeout = null;
+
+    // Autocomplete Frame Referencing State
+    let allFrames = [];
+    let filteredFrames = [];
+    let autocompleteActive = false;
+    let autocompleteTriggerPos = -1;
+    let autocompleteTriggerChar = ''; // '@' or '/'
+    let selectedAutocompleteIndex = 0;
+
+    const editor = document.getElementById('editor');
+    const notesList = document.getElementById('notesList');
+    const tabsContainer = document.getElementById('tabsContainer');
+    const appContainer = document.getElementById('appContainer');
+    const searchInput = document.getElementById('searchInput');
+    const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+
+    // Initialize Plugin - message main thread to request data
+    parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
+
+    // Listen for data from Figma main thread
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      if (msg.type === 'initData') {
+        notes = msg.notes || [];
+        
+        // Restore settings if any
+        const settings = msg.settings || {};
+        isSidebarCollapsed = !!settings.sidebarCollapsed;
+        isWindowLarge = !!settings.windowLarge;
+        openTabIds = settings.openTabs || [];
+        activeNoteId = settings.activeNoteId || null;
+
+        // Apply visual states based on loaded settings
+        if (isSidebarCollapsed) {
+          appContainer.classList.add('sidebar-collapsed');
+        }
+        
+        if (isWindowLarge) {
+          document.getElementById('resizeBtn').innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
+            </svg>
+          `;
+        }
+
+        // If no notes exist, initialize with a welcome note
+        if (notes.length === 0) {
+          const welcomeNote = {
+            id: 'welcome-note',
+            title: 'Welcome to Simple Notes',
+            content: 'Welcome to Simple Notes!\n\nThis is a simple, modern note-taking plugin inspired by Wispr Scratchpad. It auto-saves your thoughts as you write.\n\nHere are some features you can try:\n\n• Renaming: Edit the first line of the note, it auto-updates the title.\n• Tabs: Create new notes using the + button at the top.\n• Canvas: Open the "Transforms" menu below and select "Insert to Canvas" to write this note directly onto your Figma board!\n• Formatting: Use the bottom menu to easily format text as Bold, Italic, lists, etc.\n\nEnjoy writing!',
+            updatedAt: Date.now()
+          };
+          notes.push(welcomeNote);
+          activeNoteId = welcomeNote.id;
+          openTabIds = [welcomeNote.id];
+          saveNotesData();
+        }
+
+        // Validate tab lists
+        openTabIds = openTabIds.filter(id => notes.some(n => n.id === id));
+        if (openTabIds.length === 0) {
+          openTabIds = [notes[0].id];
+        }
+        if (!activeNoteId || !notes.some(n => n.id === activeNoteId)) {
+          activeNoteId = openTabIds[0];
+        }
+
+        renderSidebar();
+        renderTabs();
+        loadActiveNoteContent();
+      } else if (msg.type === 'framesList') {
+        allFrames = msg.frames || [];
+        if (autocompleteActive && autocompleteNode) {
+          const selection = window.getSelection();
+          if (selection.rangeCount) {
+            const range = selection.getRangeAt(0);
+            if (range.startContainer === autocompleteNode) {
+              const queryText = autocompleteNode.textContent.substring(autocompleteOffset + 1, range.startOffset);
+              handleAutocompleteSearch(queryText);
+            }
+          }
+        }
+        if (attachmentDropdownActive) {
+          const searchInput = document.getElementById('attachmentSearch');
+          const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+          renderAttachmentFramesList(query);
+        }
+        parseLinkedFrames();
+      } else if (msg.type === 'badgeCreated') {
+        const note = notes.find(n => n.id === msg.noteId);
+        if (note) {
+          note.badgeNodeId = msg.badgeNodeId;
+          note.attachedFrameId = msg.frameId;
+          note.attachedFrameName = msg.frameName;
+          saveNotesData();
+          renderAttachmentWidget();
+        }
+      } else if (msg.type === 'selectNoteById') {
+        const targetNote = notes.find(n => n.id === msg.noteId);
+        if (targetNote && targetNote.id !== activeNoteId) {
+          selectNote(targetNote.id);
+        }
+      }
+    };
+
+    // --- SIDEBAR ACTIONS ---
+
+    function toggleSidebar() {
+      isSidebarCollapsed = !isSidebarCollapsed;
+      if (isSidebarCollapsed) {
+        appContainer.classList.add('sidebar-collapsed');
+      } else {
+        appContainer.classList.remove('sidebar-collapsed');
+      }
+      saveSettingsData();
+    }
+
+    function expandSidebarIfCollapsed() {
+      if (isSidebarCollapsed) {
+        toggleSidebar();
+        setTimeout(() => searchInput.focus(), 150);
+      }
+    }
+
+    function createNewNote() {
+      const newId = 'note-' + Date.now();
+      const newNote = {
+        id: newId,
+        title: 'Untitled',
+        content: '',
+        updatedAt: Date.now()
+      };
+      notes.unshift(newNote); // Put it at the top
+      
+      // Add to open tabs and set active
+      openTabIds.push(newId);
+      activeNoteId = newId;
+
+      saveNotesData();
+      saveSettingsData();
+      renderSidebar();
+      renderTabs();
+      loadActiveNoteContent();
+      
+      editor.focus();
+    }
+
+    function deleteNote(id, event) {
+      if (event) event.stopPropagation();
+      
+      notes = notes.filter(n => n.id !== id);
+      openTabIds = openTabIds.filter(tid => tid !== id);
+
+      // If we deleted the active note, set a new active note
+      if (activeNoteId === id) {
+        if (openTabIds.length > 0) {
+          activeNoteId = openTabIds[openTabIds.length - 1];
+        } else if (notes.length > 0) {
+          activeNoteId = notes[0].id;
+          openTabIds = [activeNoteId];
+        } else {
+          // If no notes exist anymore, create a fresh one
+          createNewNote();
+          return;
+        }
+      }
+
+      saveNotesData();
+      saveSettingsData();
+      renderSidebar();
+      renderTabs();
+      loadActiveNoteContent();
+    }
+
+    function selectNote(id) {
+      activeNoteId = id;
+      if (!openTabIds.includes(id)) {
+        openTabIds.push(id);
+      }
+      saveSettingsData();
+      renderTabs();
+      renderSidebar();
+      loadActiveNoteContent();
+      editor.focus();
+    }
+
+    function handleSearch() {
+      searchFilter = searchInput.value.toLowerCase().trim();
+      renderSidebar();
+    }
+
+    // --- TAB ACTIONS ---
+
+    function selectTab(id) {
+      activeNoteId = id;
+      saveSettingsData();
+      renderTabs();
+      renderSidebar();
+      loadActiveNoteContent();
+      editor.focus();
+    }
+
+    function closeTab(id, event) {
+      if (event) event.stopPropagation();
+      
+      openTabIds = openTabIds.filter(tid => tid !== id);
+      
+      if (activeNoteId === id) {
+        if (openTabIds.length > 0) {
+          activeNoteId = openTabIds[openTabIds.length - 1];
+        } else if (notes.length > 0) {
+          activeNoteId = notes[0].id;
+          openTabIds = [activeNoteId];
+        } else {
+          createNewNote();
+          return;
+        }
+      }
+
+      saveSettingsData();
+      renderTabs();
+      renderSidebar();
+      loadActiveNoteContent();
+    }
+
+    // --- EDITOR LOGIC & PREVIEW ENGINE ---
+
+    let editorMode = 'edit'; // 'edit' or 'preview'
+
+    function setEditorMode(mode) {
+      editorMode = mode;
+      
+      const toggleBtns = document.querySelectorAll('#editorModeToggle .toggle-btn');
+      toggleBtns.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(mode)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      
+      const textarea = document.getElementById('editor');
+      const preview = document.getElementById('editorPreview');
+      const formattingBar = document.getElementById('formattingBar');
+      
+      if (mode === 'preview') {
+        textarea.style.display = 'none';
+        preview.style.display = 'block';
+        formattingBar.style.display = 'none';
+        
+        // Render preview content
+        preview.innerHTML = renderMarkdownToHtml(textarea.value);
+        hideLinkTooltip();
+      } else {
+        textarea.style.display = 'block';
+        preview.style.display = 'none';
+        formattingBar.style.display = 'flex';
+        textarea.focus();
+      }
+    }
+
+    function loadActiveNoteContent() {
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      if (activeNote) {
+        editor.innerHTML = activeNote.content || '';
+      } else {
+        editor.innerHTML = '';
+      }
+      
+      // Update preview if currently in preview mode
+      if (editorMode === 'preview') {
+        const preview = document.getElementById('editorPreview');
+        if (preview) {
+          preview.innerHTML = renderMarkdownToHtml(editor.innerHTML);
+        }
+      }
+    }
+
+    function renderMarkdownToHtml(markdown) {
+      if (!markdown) {
+        return '<p style="color: var(--color-text-muted); font-style: italic; font-size: 13px;">No content yet. Click "Edit" to start writing.</p>';
+      }
+      
+      const lines = markdown.split('\n');
+      const html = [];
+      let inList = null; // 'ul', 'ol', or null
+      let inQuote = false;
+      let inTable = false;
+      let tableRows = [];
+      
+      function closeList() {
+        if (inList) {
+          html.push(`</${inList}>`);
+          inList = null;
+        }
+      }
+      
+      function closeQuote() {
+        if (inQuote) {
+          html.push(`</blockquote>`);
+          inQuote = false;
+        }
+      }
+      
+      function closeTable() {
+        if (inTable) {
+          html.push(renderHtmlTable(tableRows));
+          tableRows = [];
+          inTable = false;
+        }
+      }
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        
+        // 1. Table Detection
+        if (trimmed.startsWith('|') && trimmed.includes('|', 1)) {
+          closeList();
+          closeQuote();
+          inTable = true;
+          tableRows.push(trimmed);
+          continue;
+        } else {
+          closeTable();
+        }
+        
+        // 2. Blockquote Detection
+        if (trimmed.startsWith('>')) {
+          closeList();
+          if (!inQuote) {
+            html.push(`<blockquote>`);
+            inQuote = true;
+          }
+          const quoteContent = trimmed.substring(1).trim();
+          html.push(`<p>${parseInlineMarkdown(quoteContent)}</p>`);
+          continue;
+        } else {
+          closeQuote();
+        }
+        
+        // 3. Header Detection
+        if (trimmed.startsWith('## ')) {
+          closeList();
+          html.push(`<h2>${parseInlineMarkdown(trimmed.substring(3))}</h2>`);
+          continue;
+        } else if (trimmed.startsWith('# ')) {
+          closeList();
+          html.push(`<h1>${parseInlineMarkdown(trimmed.substring(2))}</h1>`);
+          continue;
+        }
+        
+        // 4. Checklist Item Detection
+        if (trimmed.startsWith('- [ ] ') || trimmed.startsWith('- [x] ') || trimmed.startsWith('- [X] ')) {
+          if (inList !== 'ul') {
+            closeList();
+            html.push(`<ul class="checklist-container">`);
+            inList = 'ul';
+          }
+          const checked = trimmed.startsWith('- [ ] ') ? '' : 'checked';
+          const content = trimmed.substring(6);
+          html.push(`<li class="checklist-item"><input type="checkbox" ${checked} disabled /> <span>${parseInlineMarkdown(content)}</span></li>`);
+          continue;
+        }
+        
+        // 5. Unordered List Detection
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+          if (inList !== 'ul') {
+            closeList();
+            html.push(`<ul>`);
+            inList = 'ul';
+          }
+          html.push(`<li>${parseInlineMarkdown(trimmed.substring(2))}</li>`);
+          continue;
+        }
+        
+        // 6. Ordered List Detection
+        const olMatch = trimmed.match(/^(\d+)\.\s(.*)/);
+        if (olMatch) {
+          if (inList !== 'ol') {
+            closeList();
+            html.push(`<ol>`);
+            inList = 'ol';
+          }
+          html.push(`<li>${parseInlineMarkdown(olMatch[2])}</li>`);
+          continue;
+        }
+        
+        // Empty Line
+        if (trimmed === '') {
+          closeList();
+          html.push('<br/>');
+          continue;
+        }
+        
+        // Default Paragraph
+        closeList();
+        html.push(`<p>${parseInlineMarkdown(line)}</p>`);
+      }
+      
+      // Clean up any remaining open blocks
+      closeList();
+      closeQuote();
+      closeTable();
+      
+      return html.join('\n');
+    }
+
+    function renderHtmlTable(rows) {
+      if (rows.length === 0) return '';
+      
+      // Filter out standard divider rows like |---|---|
+      const filteredRows = rows.filter(row => {
+        const clean = row.replace(/[|:\s-]/g, '');
+        return clean.length > 0;
+      });
+      
+      if (filteredRows.length === 0) return '';
+      
+      let html = ['<div class="table-container"><table>'];
+      
+      // First row is the header
+      const headerCells = splitTableRow(filteredRows[0]);
+      html.push('<thead><tr>');
+      headerCells.forEach(cell => {
+        html.push(`<th>${parseInlineMarkdown(cell.trim())}</th>`);
+      });
+      html.push('</tr></thead>');
+      
+      // Remaining rows are the body
+      if (filteredRows.length > 1) {
+        html.push('<tbody>');
+        for (let r = 1; r < filteredRows.length; r++) {
+          html.push('<tr>');
+          const cells = splitTableRow(filteredRows[r]);
+          for (let c = 0; c < headerCells.length; c++) {
+            const val = cells[c] ? cells[c].trim() : '';
+            html.push(`<td>${parseInlineMarkdown(val)}</td>`);
+          }
+          html.push('</tr>');
+        }
+        html.push('</tbody>');
+      }
+      
+      html.push('</table></div>');
+      return html.join('');
+    }
+
+    function splitTableRow(rowText) {
+      let text = rowText.trim();
+      if (text.startsWith('|')) text = text.slice(1);
+      if (text.endsWith('|')) text = text.slice(0, -1);
+      return text.split('|');
+    }
+
+    function parseInlineMarkdown(text) {
+      let result = escapeHtml(text);
+      
+      // Inline Code: `code`
+      result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
+      
+      // Bold: **text**
+      result = result.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // Italic: *text*
+      result = result.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      
+      // Strikethrough: ~~text~~
+      result = result.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+      
+      // Links: [Text](URL)
+      result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
+        let nodeId = '';
+        if (url.startsWith('figma://node-id=')) {
+          nodeId = decodeURIComponent(url.substring('figma://node-id='.length));
+        } else if (url.includes('figma.com') && url.includes('node-id=')) {
+          try {
+            const decodedUrl = url.replace(/&amp;/g, '&');
+            const urlObj = new URL(decodedUrl);
+            nodeId = urlObj.searchParams.get('node-id') || '';
+          } catch(e) {
+            nodeId = '';
+          }
+        }
+        
+        if (nodeId) {
+          return `<a href="#" class="frame-link" onclick="jumpToFrameDirect('${nodeId}', event)">${linkText}</a>`;
+        } else {
+          return `<a href="${url}" target="_blank">${linkText}</a>`;
+        }
+      });
+      
+      return result;
+    }
+
+    function jumpToFrameDirect(nodeId, event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      parent.postMessage({ pluginMessage: { type: 'goToFrame', nodeId: nodeId } }, '*');
+    }
+
+    function handleEditorInput() {
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      if (!activeNote) return;
+
+      activeNote.content = editor.innerHTML;
+      activeNote.updatedAt = Date.now();
+
+      // Automatically determine the title from the first line of the plain text content
+      const text = editor.innerText;
+      const lines = text.split('\n');
+      const firstLine = lines[0] ? lines[0].trim() : '';
+      activeNote.title = firstLine || 'Untitled';
+
+      // Re-sort the notes array to move the recently edited note to the top of list
+      const index = notes.findIndex(n => n.id === activeNoteId);
+      if (index > 0) {
+        notes.splice(index, 1);
+        notes.unshift(activeNote);
+      }
+
+      // Re-render sidebar & tabs without breaking keyboard focus
+      renderSidebarListOnly();
+      updateActiveTabTitle(activeNote.title);
+
+      // Update badge title if attached
+      if (activeNote.attachedFrameId && activeNote.badgeNodeId) {
+        parent.postMessage({
+          pluginMessage: {
+            type: 'updateBadgeTitle',
+            badgeNodeId: activeNote.badgeNodeId,
+            noteTitle: activeNote.title
+          }
+        }, '*');
+      }
+
+      // Debounce saving to Figma storage to avoid performance lags
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        saveNotesData();
+      }, 500);
+
+      // Parse linked frames dynamically on input
+      parseLinkedFrames();
+    }
+
+    // --- RENDERING HELPERS ---
+
+    function renderSidebar() {
+      renderSidebarListOnly();
+    }
+
+    function renderSidebarListOnly() {
+      notesList.innerHTML = '';
+      
+      const filteredNotes = notes.filter(n => {
+        if (!searchFilter) return true;
+        return n.title.toLowerCase().includes(searchFilter) || n.content.toLowerCase().includes(searchFilter);
+      });
+
+      if (filteredNotes.length === 0) {
+        notesList.innerHTML = `<div class="empty-search-state">${searchFilter ? 'No matching notes' : 'No notes'}</div>`;
+        return;
+      }
+
+      filteredNotes.forEach(note => {
+        const item = document.createElement('div');
+        item.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
+        item.onclick = () => selectNote(note.id);
+        item.title = note.title;
+
+        const timeStr = getRelativeTime(note.updatedAt);
+
+        item.innerHTML = `
+          <div class="note-item-title">${escapeHtml(note.title)}</div>
+          <div class="note-item-time">${timeStr}</div>
+          <button class="note-item-delete" onclick="deleteNote('${note.id}', event)" title="Delete note">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        `;
+        notesList.appendChild(item);
+      });
+    }
+
+    function renderTabs() {
+      tabsContainer.innerHTML = '';
+      openTabIds.forEach(id => {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+
+        const tab = document.createElement('div');
+        tab.className = `tab ${id === activeNoteId ? 'active' : ''}`;
+        tab.onclick = () => selectTab(id);
+
+        tab.innerHTML = `
+          <span class="tab-title">${escapeHtml(note.title)}</span>
+          <span class="tab-close" onclick="closeTab('${id}', event)">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </span>
+        `;
+        tabsContainer.appendChild(tab);
+      });
+    }
+
+    function updateActiveTabTitle(title) {
+      const activeTab = tabsContainer.querySelector('.tab.active .tab-title');
+      if (activeTab) {
+        activeTab.textContent = title;
+      }
+    }
+
+    // --- TRANSFORMS & FORMATTING ACTIONS ---
+
+    // Toggle popover states and close other open popovers
+    function togglePopover(menuId, event) {
+      if (event) event.stopPropagation();
+      
+      const targetMenu = document.getElementById(menuId);
+      const allMenus = document.querySelectorAll('.popover-menu');
+      
+      const wasOpen = targetMenu.classList.contains('show');
+      
+      allMenus.forEach(m => m.classList.remove('show'));
+      
+      if (!wasOpen) {
+        targetMenu.classList.add('show');
+        if (menuId === 'transformsMenu') {
+          // Request fresh frames list to parse linkages
+          parent.postMessage({ pluginMessage: { type: 'getFrames' } }, '*');
+        }
+      }
+    }
+
+    // Close popovers if clicked anywhere outside
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+      closeAutocomplete();
+    });
+
+
+    // Text Transformations
+    function transformText(type) {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      const selectedText = range.toString();
+      
+      if (!selectedText) {
+        // Transform the entire editor text content
+        const text = editor.innerText;
+        let transformed = '';
+        if (type === 'uppercase') transformed = text.toUpperCase();
+        else if (type === 'lowercase') transformed = text.toLowerCase();
+        else if (type === 'titlecase') transformed = text.replace(/\b\w/g, c => c.toUpperCase());
+        else if (type === 'clean') transformed = text.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n\n');
+        
+        editor.innerText = transformed;
+      } else {
+        let transformed = '';
+        if (type === 'uppercase') transformed = selectedText.toUpperCase();
+        else if (type === 'lowercase') transformed = selectedText.toLowerCase();
+        else if (type === 'titlecase') transformed = selectedText.replace(/\b\w/g, c => c.toUpperCase());
+        else if (type === 'clean') transformed = selectedText.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n\n');
+        
+        range.deleteContents();
+        range.insertNode(document.createTextNode(transformed));
+      }
+      
+      editor.focus();
+      handleEditorInput();
+    }
+
+    function showStats() {
+      const text = editor.innerText;
+      const chars = text.length;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const lines = text ? text.split('\n').length : 0;
+      
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'notify', 
+          message: `Note Statistics: ${words} Words, ${chars} Characters, ${lines} Lines.` 
+        } 
+      }, '*');
+    }
+
+    // Parse HTML to JSON blocks for Figma canvas creation
+    function parseNodeToSegments(node, currentStyles = { bold: false, italic: false, underline: false, strikethrough: false, code: false, linkUrl: null }) {
+      let segments = [];
+      
+      for (let i = 0; i < node.childNodes.length; i++) {
+        const child = node.childNodes[i];
+        
+        if (child.nodeType === Node.TEXT_NODE) {
+          const text = child.textContent;
+          if (text) {
+            segments.push({
+              text: text,
+              ...currentStyles
+            });
+          }
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (child.getAttribute('contenteditable') === 'false' || child.classList.contains('table-toolbar')) {
+            continue;
+          }
+          const tagName = child.tagName.toLowerCase();
+          const newStyles = { ...currentStyles };
+          
+          if (tagName === 'strong' || tagName === 'b') {
+            newStyles.bold = true;
+          } else if (tagName === 'em' || tagName === 'i') {
+            newStyles.italic = true;
+          } else if (tagName === 'u') {
+            newStyles.underline = true;
+          } else if (tagName === 'strike' || tagName === 'del' || tagName === 's') {
+            newStyles.strikethrough = true;
+          } else if (tagName === 'code') {
+            newStyles.code = true;
+          } else if (tagName === 'a') {
+            newStyles.linkUrl = child.dataset.url || child.getAttribute('href');
+            if (newStyles.linkUrl === '#' || !newStyles.linkUrl) {
+              const nodeId = child.dataset.nodeId;
+              if (nodeId) {
+                newStyles.linkUrl = `figma://node-id=${encodeURIComponent(nodeId)}`;
+              }
+            }
+          }
+          
+          segments = segments.concat(parseNodeToSegments(child, newStyles));
+        }
+      }
+      
+      return segments;
+    }
+
+    function parseHtmlToBlocks(editorElement) {
+      const blocks = [];
+      let pendingInlineNodes = [];
+      
+      function flushPendingInline() {
+        if (pendingInlineNodes.length > 0) {
+          const temp = document.createElement('div');
+          pendingInlineNodes.forEach(node => temp.appendChild(node.cloneNode(true)));
+          const segments = parseNodeToSegments(temp);
+          if (segments.length > 0 && segments.some(s => s.text.trim().length > 0)) {
+            blocks.push({
+              type: 'paragraph',
+              segments: segments
+            });
+          }
+          pendingInlineNodes = [];
+        }
+      }
+      
+      for (let i = 0; i < editorElement.childNodes.length; i++) {
+        const child = editorElement.childNodes[i];
+        
+        if (child.nodeType === Node.TEXT_NODE) {
+          pendingInlineNodes.push(child);
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          const tagName = child.tagName.toLowerCase();
+          const isTableContainer = child.classList.contains('table-container') || tagName === 'table';
+          const isBlock = ['h1', 'h2', 'p', 'blockquote', 'ul', 'ol', 'hr'].includes(tagName) || isTableContainer;
+          
+          if (isBlock) {
+            flushPendingInline();
+            
+            if (tagName === 'h1' || tagName === 'h2') {
+              blocks.push({
+                type: tagName,
+                segments: parseNodeToSegments(child)
+              });
+            } else if (tagName === 'p') {
+              blocks.push({
+                type: 'paragraph',
+                segments: parseNodeToSegments(child)
+              });
+            } else if (tagName === 'blockquote') {
+              blocks.push({
+                type: 'blockquote',
+                segments: parseNodeToSegments(child)
+              });
+            } else if (tagName === 'hr') {
+              blocks.push({
+                type: 'hr'
+              });
+            } else if (tagName === 'ul' || tagName === 'ol') {
+              const listType = tagName === 'ul' ? 'bullet_list' : 'numbered_list';
+              const items = [];
+              const isChecklist = child.classList.contains('checklist-container') || child.querySelector('.checklist-item');
+              
+              const liNodes = child.querySelectorAll('li');
+              liNodes.forEach(li => {
+                const checkbox = li.querySelector('input[type="checkbox"]');
+                if (checkbox || li.classList.contains('checklist-item')) {
+                  const clonedLi = li.cloneNode(true);
+                  const cb = clonedLi.querySelector('input[type="checkbox"]');
+                  if (cb) clonedLi.removeChild(cb);
+                  
+                  const isChecked = checkbox ? checkbox.checked : false;
+                  items.push({
+                    checked: isChecked,
+                    segments: parseNodeToSegments(clonedLi)
+                  });
+                } else {
+                  items.push({
+                    segments: parseNodeToSegments(li)
+                  });
+                }
+              });
+              
+              blocks.push({
+                type: isChecklist ? 'checklist' : listType,
+                items: items
+              });
+            } else if (isTableContainer) {
+              const tableNode = tagName === 'table' ? child : child.querySelector('table');
+              if (tableNode) {
+                const rows = [];
+                const trNodes = tableNode.querySelectorAll('tr');
+                trNodes.forEach(tr => {
+                  const cells = [];
+                  const cellNodes = tr.querySelectorAll('th, td');
+                  cellNodes.forEach(cell => {
+                    cells.push({
+                      isHeader: cell.tagName.toLowerCase() === 'th',
+                      segments: parseNodeToSegments(cell)
+                    });
+                  });
+                  if (cells.length > 0) {
+                    rows.push(cells);
+                  }
+                });
+                
+                if (rows.length > 0) {
+                  blocks.push({
+                    type: 'table',
+                    rows: rows
+                  });
+                }
+              }
+            }
+          } else {
+            // Inline elements span, strong, em, code, a, br
+            if (tagName === 'br') {
+              flushPendingInline();
+            } else {
+              pendingInlineNodes.push(child);
+            }
+          }
+        }
+      }
+      
+      flushPendingInline();
+      return blocks;
+    }
+
+    function insertIntoFigmaCanvas() {
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      const title = activeNote ? activeNote.title : 'Untitled';
+      const blocks = parseHtmlToBlocks(editor);
+      parent.postMessage({ pluginMessage: { type: 'insertIntoCanvas', blocks, title } }, '*');
+    }
+
+    // --- CLIPBOARD & WINDOW CONTROLS ---
+
+    function copyNoteContent() {
+      const text = editor.innerText;
+      if (!text.trim()) {
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Nothing to copy!', error: true } }, '*');
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        const copyBtn = document.getElementById('copyBtn');
+        const copyText = document.getElementById('copyText');
+        const copyIcon = document.getElementById('copyIcon');
+        
+        copyBtn.classList.add('copied');
+        copyText.textContent = 'Copied!';
+        copyIcon.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        `;
+        
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Copied to clipboard!' } }, '*');
+
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyText.textContent = 'Copy';
+          copyIcon.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          `;
+        }, 2000);
+      }).catch(err => {
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Copy failed: ' + err, error: true } }, '*');
+      });
+    }
+
+    function toggleWindowSize() {
+      isWindowLarge = !isWindowLarge;
+      const resizeBtn = document.getElementById('resizeBtn');
+      
+      let width = 680;
+      let height = 520;
+
+      if (isWindowLarge) {
+        width = 840;
+        height = 620;
+        resizeBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
+          </svg>
+        `;
+        resizeBtn.title = "Collapse window size";
+      } else {
+        resizeBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+          </svg>
+        `;
+        resizeBtn.title = "Expand window size";
+      }
+      
+      parent.postMessage({ pluginMessage: { type: 'resize', width, height } }, '*');
+      saveSettingsData();
+    }
+
+    // --- DATA SAVING & SYNC ---
+
+    function saveNotesData() {
+      parent.postMessage({ pluginMessage: { type: 'saveNotes', notes } }, '*');
+    }
+
+    function saveSettingsData() {
+      const settings = {
+        sidebarCollapsed: isSidebarCollapsed,
+        windowLarge: isWindowLarge,
+        openTabs: openTabIds,
+        activeNoteId: activeNoteId
+      };
+      parent.postMessage({ pluginMessage: { type: 'saveSettings', settings } }, '*');
+    }
+
+    // --- OTHER HELPERS ---
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    function getRelativeTime(timestamp) {
+      const diffMs = Date.now() - timestamp;
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHrs = Math.floor(diffMin / 60);
+      const diffDays = Math.floor(diffHrs / 24);
+
+      if (diffSec < 10) {
+        return 'just now';
+      } else if (diffSec < 60) {
+        return `${diffSec} seconds ago`;
+      } else if (diffMin === 1) {
+        return 'about a minute ago';
+      } else if (diffMin < 60) {
+        return `${diffMin} minutes ago`;
+      } else if (diffHrs === 1) {
+        return 'about an hour ago';
+      } else if (diffHrs < 24) {
+        return `about ${diffHrs} hours ago`;
+      } else if (diffDays === 1) {
+        return 'yesterday';
+      } else {
+        const date = new Date(timestamp);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+      }
+    }
+    // --- AUTOCOMPLETE & FRAME REFERENCES HELPERS ---
+
+    function handleAutocompleteSearch(query = '') {
+      if (!autocompleteActive) return;
+      
+      const cleanQuery = query.toLowerCase().trim();
+      filteredFrames = allFrames.filter(f => f.name.toLowerCase().includes(cleanQuery));
+
+      if (filteredFrames.length === 0) {
+        autocompleteDropdown.style.display = 'none';
+        return;
+      }
+
+      // Cap results list
+      filteredFrames = filteredFrames.slice(0, 15);
+      renderAutocompleteList();
+      
+      try {
+        const selection = window.getSelection();
+        if (selection.rangeCount) {
+          const range = selection.getRangeAt(0).cloneRange();
+          range.setStart(autocompleteNode, autocompleteOffset);
+          range.setEnd(autocompleteNode, autocompleteOffset + 1);
+          
+          let rect = range.getBoundingClientRect();
+          if (rect.width === 0 && rect.height === 0) {
+            const span = document.createElement('span');
+            span.textContent = '\u200b';
+            range.insertNode(span);
+            rect = span.getBoundingClientRect();
+            span.parentNode.removeChild(span);
+          }
+          
+          const editorRect = editor.getBoundingClientRect();
+          const x = rect.left - editorRect.left + editor.scrollLeft;
+          const y = rect.bottom - editorRect.top + editor.scrollTop + 4;
+          
+          autocompleteDropdown.style.left = `${Math.min(x, editor.clientWidth - 210)}px`;
+          autocompleteDropdown.style.top = `${y}px`;
+          autocompleteDropdown.style.display = 'flex';
+        }
+      } catch (err) {
+        console.error("Error positioning autocomplete:", err);
+      }
+    }
+
+    function renderAutocompleteList() {
+      autocompleteDropdown.innerHTML = '';
+      filteredFrames.forEach((frame, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `autocomplete-item ${idx === selectedAutocompleteIndex ? 'selected' : ''}`;
+        btn.innerHTML = `🖼️ ${escapeHtml(frame.name)}`;
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          insertAutocompleteFrame(frame.name);
+        };
+        if (idx === selectedAutocompleteIndex) {
+          setTimeout(() => btn.scrollIntoView({ block: 'nearest' }), 0);
+        }
+        autocompleteDropdown.appendChild(btn);
+      });
+    }
+
+    function insertAutocompleteFrame(frameName) {
+      if (!autocompleteActive || !autocompleteNode) return;
+      
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      
+      const range = selection.getRangeAt(0);
+      range.setStart(autocompleteNode, autocompleteOffset);
+      range.setEnd(autocompleteNode, selection.focusOffset);
+      
+      const frame = allFrames.find(f => f.name === frameName);
+      const url = frame ? frame.url : `figma://node-id=${encodeURIComponent(frameName)}`;
+      
+      const link = document.createElement('a');
+      link.href = '#';
+      link.className = 'frame-link';
+      link.textContent = frameName;
+      link.setAttribute('onclick', `jumpToFrameDirect('${frame ? frame.id : frameName}', event)`);
+      link.dataset.nodeId = frame ? frame.id : frameName;
+      link.dataset.url = url;
+      
+      range.deleteContents();
+      range.insertNode(link);
+      
+      range.setStartAfter(link);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      closeAutocomplete();
+      handleEditorInput();
+    }
+
+    function closeAutocomplete() {
+      autocompleteActive = false;
+      autocompleteNode = null;
+      autocompleteDropdown.style.display = 'none';
+    }
+
+    function parseLinkedFrames() {
+      const linkedFramesContainer = document.getElementById('linkedFramesContainer');
+      const linkedFramesHeader = document.getElementById('linkedFramesHeader');
+      
+      if (!linkedFramesContainer || !linkedFramesHeader) return;
+      linkedFramesContainer.innerHTML = '';
+      
+      const referencedItems = [];
+      const links = editor.querySelectorAll('a');
+      links.forEach(link => {
+        const nodeId = link.dataset.nodeId || getFigmaNodeIdFromUrl(link.getAttribute('href') || '');
+        const name = link.textContent.trim();
+        const url = link.dataset.url || link.getAttribute('href') || '';
+        
+        if (nodeId && name && url && !referencedItems.some(item => item.nodeId === nodeId)) {
+          referencedItems.push({ name, url, nodeId });
+        }
+      });
+
+      if (referencedItems.length === 0) {
+        linkedFramesHeader.style.display = 'none';
+        return;
+      }
+
+      let count = 0;
+      referencedItems.forEach(item => {
+        count++;
+        const btn = document.createElement('button');
+        btn.className = 'popover-item';
+        btn.style.paddingLeft = '12px';
+        btn.innerHTML = `
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ${escapeHtml(item.name)}</span>
+          <span class="popover-shortcut">Jump</span>
+        `;
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          parent.postMessage({ pluginMessage: { type: 'goToFrame', nodeId: item.nodeId } }, '*');
+        };
+        linkedFramesContainer.appendChild(btn);
+      });
+
+      if (count > 0) {
+        linkedFramesHeader.style.display = 'block';
+      } else {
+        linkedFramesHeader.style.display = 'none';
+      }
+    }
+
+    // Capture keyboard events in contenteditable
+    editor.addEventListener('keydown', (e) => {
+      const isMeta = e.metaKey || e.ctrlKey;
+      
+      // Auto-save on shortcut triggers
+      if (isMeta && (e.key === 'b' || e.key === 'i' || e.key === 'u')) {
+        setTimeout(handleEditorInput, 10);
+      }
+
+      if (!autocompleteActive) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedAutocompleteIndex = (selectedAutocompleteIndex + 1) % filteredFrames.length;
+        renderAutocompleteList();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedAutocompleteIndex = (selectedAutocompleteIndex - 1 + filteredFrames.length) % filteredFrames.length;
+        renderAutocompleteList();
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        if (filteredFrames[selectedAutocompleteIndex]) {
+          insertAutocompleteFrame(filteredFrames[selectedAutocompleteIndex].name);
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeAutocomplete();
+      }
+    });
+
+    editor.addEventListener('keyup', (e) => {
+      if (!autocompleteActive && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        checkLinkClick();
+        return;
+      }
+
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+
+      const range = selection.getRangeAt(0);
+      const container = range.startContainer;
+
+      if (container.nodeType === Node.TEXT_NODE) {
+        const text = container.textContent;
+        const caretOffset = range.startOffset;
+        const textBeforeCaret = text.substring(0, caretOffset);
+
+        // Find triggers
+        const lastAt = textBeforeCaret.lastIndexOf('@');
+        const lastSlash = textBeforeCaret.lastIndexOf('/');
+
+        let triggerIdx = -1;
+        let triggerChar = '';
+
+        if (lastAt !== -1 && (lastSlash === -1 || lastAt > lastSlash)) {
+          triggerIdx = lastAt;
+          triggerChar = '@';
+        } else if (lastSlash !== -1 && (lastAt === -1 || lastSlash > lastAt)) {
+          triggerIdx = lastSlash;
+          triggerChar = '/';
+        }
+
+        if (triggerIdx !== -1) {
+          const charBeforeTrigger = triggerIdx > 0 ? textBeforeCaret.charAt(triggerIdx - 1) : ' ';
+          if ([' ', '\n', '\u00A0', '\u200b'].includes(charBeforeTrigger)) {
+            autocompleteActive = true;
+            autocompleteTriggerChar = triggerChar;
+            autocompleteNode = container;
+            autocompleteOffset = triggerIdx;
+
+            const query = textBeforeCaret.substring(triggerIdx + 1);
+            if (!query.includes('\n')) {
+              handleAutocompleteSearch(query);
+              return;
+            }
+          }
+        }
+      }
+
+      closeAutocomplete();
+      checkLinkClick();
+    });
+
+    editor.addEventListener('click', () => {
+      closeAutocomplete();
+      checkLinkClick();
+    });
+
+    editor.addEventListener('scroll', () => {
+      checkLinkClick();
+    });
+
+    // Formatting insertion handler
+    function applyFormat(type) {
+      if (type === 'bold') {
+        document.execCommand('bold', false, null);
+      } else if (type === 'italic') {
+        document.execCommand('italic', false, null);
+      } else if (type === 'underline') {
+        document.execCommand('underline', false, null);
+      } else if (type === 'strikethrough') {
+        document.execCommand('strikeThrough', false, null);
+      } else if (type === 'code') {
+        const selection = window.getSelection();
+        if (selection.rangeCount) {
+          const range = selection.getRangeAt(0);
+          const selectedText = range.toString();
+          
+          const codeNode = document.createElement('code');
+          codeNode.textContent = selectedText || 'code';
+          
+          range.deleteContents();
+          range.insertNode(codeNode);
+          
+          range.setStartAfter(codeNode);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      } else if (type === 'link') {
+        const selection = window.getSelection();
+        if (selection.rangeCount) {
+          const range = selection.getRangeAt(0).cloneRange();
+          
+          // Check if selection is inside an existing link
+          let parentLink = null;
+          let node = range.commonAncestorContainer;
+          while (node && node !== editor) {
+            if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'a') {
+              parentLink = node;
+              break;
+            }
+            node = node.parentNode;
+          }
+          
+          let urlPrompt = 'https://';
+          let defaultText = '';
+          
+          if (parentLink) {
+            urlPrompt = parentLink.getAttribute('data-url') || parentLink.getAttribute('href') || parentLink.href;
+            defaultText = parentLink.textContent;
+          } else {
+            defaultText = range.toString();
+            if (defaultText.startsWith('http')) {
+              urlPrompt = defaultText;
+            }
+          }
+          
+          const url = prompt('Enter URL (leave empty to remove link):', urlPrompt);
+          if (url === null) return; // User clicked Cancel
+          
+          // Restore the selection
+          selection.removeAllRanges();
+          selection.addRange(range);
+          
+          if (parentLink) {
+            if (url.trim() === '') {
+              // Remove the link (unwrap)
+              const textNode = document.createTextNode(parentLink.textContent);
+              parentLink.parentNode.replaceChild(textNode, parentLink);
+            } else {
+              // Update existing link
+              const targetUrl = url.trim();
+              parentLink.setAttribute('href', targetUrl);
+              parentLink.dataset.url = targetUrl;
+              
+              // If it's a figma node link, set class/nodeId
+              if (targetUrl.startsWith('figma://node-id=') || targetUrl.includes('node-id=')) {
+                parentLink.className = 'frame-link';
+                const nodeId = getFigmaNodeIdFromUrl(targetUrl);
+                if (nodeId) {
+                  parentLink.dataset.nodeId = nodeId;
+                  parentLink.setAttribute('onclick', `jumpToFrameDirect('${nodeId}', event)`);
+                }
+              } else {
+                parentLink.className = '';
+                parentLink.removeAttribute('onclick');
+                parentLink.removeAttribute('data-node-id');
+                parentLink.target = '_blank';
+              }
+            }
+          } else {
+            // Create a new link
+            if (url.trim() === '') return;
+            const targetUrl = url.trim();
+            
+            const link = document.createElement('a');
+            link.href = targetUrl;
+            link.dataset.url = targetUrl;
+            link.textContent = defaultText || 'Link';
+            
+            if (targetUrl.startsWith('figma://node-id=') || targetUrl.includes('node-id=')) {
+              link.className = 'frame-link';
+              const nodeId = getFigmaNodeIdFromUrl(targetUrl);
+              if (nodeId) {
+                link.dataset.nodeId = nodeId;
+                link.setAttribute('onclick', `jumpToFrameDirect('${nodeId}', event)`);
+              }
+            } else {
+              link.target = '_blank';
+            }
+            
+            range.deleteContents();
+            range.insertNode(link);
+            
+            // Move cursor after the link
+            const newRange = document.createRange();
+            newRange.setStartAfter(link);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+          }
+        }
+      } else if (type === 'bullet') {
+        document.execCommand('insertUnorderedList', false, null);
+      } else if (type === 'number') {
+        document.execCommand('insertOrderedList', false, null);
+      } else if (type === 'checkbox') {
+        const checkboxHtml = `<ul class="checklist-container"><li class="checklist-item"><input type="checkbox"> <span>Checklist item</span></li></ul>`;
+        document.execCommand('insertHTML', false, checkboxHtml);
+      } else if (type === 'quote') {
+        document.execCommand('formatBlock', false, 'blockquote');
+      } else if (type === 'table') {
+        toggleTableWizard();
+      } else if (type === 'h1') {
+        document.execCommand('formatBlock', false, 'H1');
+      } else if (type === 'h2') {
+        document.execCommand('formatBlock', false, 'H2');
+      }
+
+      handleEditorInput();
+    }
+
+    // Link Helper Tooltip methods
+    let currentActiveLink = null;
+
+    function getFigmaNodeIdFromUrl(url) {
+      if (url.startsWith('figma://node-id=')) {
+        return decodeURIComponent(url.substring('figma://node-id='.length));
+      }
+      try {
+        const urlObj = new URL(url);
+        return urlObj.searchParams.get('node-id') || '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function checkLinkClick() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) {
+        hideLinkTooltip();
+        return;
+      }
+      
+      const range = selection.getRangeAt(0);
+      let container = range.startContainer;
+      
+      let anchor = null;
+      while (container && container !== editor) {
+        if (container.nodeType === Node.ELEMENT_NODE && container.tagName.toLowerCase() === 'a') {
+          anchor = container;
+          break;
+        }
+        container = container.parentNode;
+      }
+
+      if (anchor) {
+        currentActiveLink = anchor;
+        const rect = anchor.getBoundingClientRect();
+        const editorRect = editor.getBoundingClientRect();
+        
+        const nodeId = anchor.dataset.nodeId || getFigmaNodeIdFromUrl(anchor.getAttribute('href') || '');
+        const url = anchor.getAttribute('href') || '';
+        
+        const jumpBtn = document.getElementById('tooltipJumpBtn');
+        const openBtn = document.getElementById('tooltipOpenBtn');
+
+        if (nodeId) {
+          jumpBtn.style.display = 'flex';
+          jumpBtn.onclick = (e) => {
+            e.stopPropagation();
+            parent.postMessage({ pluginMessage: { type: 'goToFrame', nodeId: nodeId } }, '*');
+            hideLinkTooltip();
+          };
+        } else {
+          jumpBtn.style.display = 'none';
+        }
+
+        openBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (url && !url.startsWith('#')) {
+            window.open(url, '_blank');
+          }
+          hideLinkTooltip();
+        };
+
+        const linkTooltip = document.getElementById('linkTooltip');
+        const x = rect.left - editorRect.left + editor.scrollLeft;
+        const y = rect.top - editorRect.top + editor.scrollTop - 36;
+        
+        linkTooltip.style.left = `${Math.min(x, editor.clientWidth - 180)}px`;
+        linkTooltip.style.top = `${y}px`;
+        linkTooltip.style.display = 'flex';
+      } else {
+        hideLinkTooltip();
+      }
+    }
+
+    function hideLinkTooltip() {
+      currentActiveLink = null;
+      document.getElementById('linkTooltip').style.display = 'none';
+    }
+
+    // --- ATTACHMENT LOGIC ---
+    let attachmentDropdownActive = false;
+
+    function renderAttachmentWidget() {
+      const widget = document.getElementById('attachmentWidget');
+      if (!widget) return;
+      
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      if (!activeNote) {
+        widget.innerHTML = '';
+        return;
+      }
+      
+      if (activeNote.attachedFrameId && activeNote.badgeNodeId) {
+        widget.innerHTML = `
+          <div class="attachment-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 0 0-10 10c0 5.25 10 12 10 12s10-6.75 10-12a10 10 0 0 0-10-10z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span style="max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Attached: ${escapeHtml(activeNote.attachedFrameName)}</span>
+            <div class="attachment-badge-actions">
+              <button class="attachment-action-btn" onclick="zoomToAttachedFrame(event)" title="Zoom to Frame">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </button>
+              <button class="attachment-action-btn" onclick="detachFromFrame(event)" title="Detach Note">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        widget.innerHTML = `
+          <button class="attachment-btn" id="attachmentBtn" onclick="toggleAttachmentDropdown(event)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span>Attach to Frame</span>
+          </button>
+          
+          <div class="attachment-dropdown" id="attachmentDropdown">
+            <input type="text" class="attachment-dropdown-search" id="attachmentSearch" placeholder="Search frames..." oninput="filterAttachmentFrames(event)" onclick="event.stopPropagation()">
+            <div id="attachmentFramesList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function toggleAttachmentDropdown(event) {
+      if (event) event.stopPropagation();
+      const dropdown = document.getElementById('attachmentDropdown');
+      if (!dropdown) return;
+      
+      const active = dropdown.style.display === 'flex';
+      if (active) {
+        closeAttachmentDropdown();
+      } else {
+        dropdown.style.display = 'flex';
+        attachmentDropdownActive = true;
+        const searchInput = document.getElementById('attachmentSearch');
+        if (searchInput) {
+          searchInput.value = '';
+          setTimeout(() => searchInput.focus(), 50);
+        }
+        
+        // Request frames
+        parent.postMessage({ pluginMessage: { type: 'getFrames' } }, '*');
+        
+        const closeDropdownOuter = (e) => {
+          const btn = document.getElementById('attachmentBtn');
+          if (dropdown && !dropdown.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            closeAttachmentDropdown();
+            document.removeEventListener('click', closeDropdownOuter);
+          }
+        };
+        setTimeout(() => document.addEventListener('click', closeDropdownOuter), 0);
+      }
+    }
+
+    function closeAttachmentDropdown() {
+      const dropdown = document.getElementById('attachmentDropdown');
+      if (dropdown) dropdown.style.display = 'none';
+      attachmentDropdownActive = false;
+    }
+
+    function filterAttachmentFrames(event) {
+      const query = event.target.value.toLowerCase().trim();
+      renderAttachmentFramesList(query);
+    }
+
+    function renderAttachmentFramesList(query = '') {
+      const container = document.getElementById('attachmentFramesList');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      const filtered = allFrames.filter(f => f.name.toLowerCase().includes(query));
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="attachment-dropdown-empty">No frames found</div>`;
+        return;
+      }
+      
+      filtered.forEach(frame => {
+        const item = document.createElement('button');
+        item.className = 'attachment-dropdown-item';
+        item.textContent = frame.name;
+        item.onclick = (e) => {
+          e.stopPropagation();
+          attachNoteToFrame(frame.id, frame.name);
+        };
+        container.appendChild(item);
+      });
+    }
+
+    function attachNoteToFrame(frameId, frameName) {
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      if (!activeNote) return;
+      
+      parent.postMessage({
+        pluginMessage: {
+          type: 'attachToFrame',
+          frameId: frameId,
+          noteId: activeNote.id,
+          noteTitle: activeNote.title,
+          oldBadgeNodeId: activeNote.badgeNodeId || null
+        }
+      }, '*');
+      
+      closeAttachmentDropdown();
+    }
+
+    function zoomToAttachedFrame(event) {
+      if (event) event.stopPropagation();
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      if (activeNote && activeNote.attachedFrameId) {
+        parent.postMessage({
+          pluginMessage: {
+            type: 'goToFrame',
+            nodeId: activeNote.attachedFrameId
+          }
+        }, '*');
+      }
+    }
+
+    function detachFromFrame(event) {
+      if (event) event.stopPropagation();
+      const activeNote = notes.find(n => n.id === activeNoteId);
+      if (activeNote) {
+        if (activeNote.badgeNodeId) {
+          parent.postMessage({
+            pluginMessage: {
+              type: 'detachFromFrame',
+              badgeNodeId: activeNote.badgeNodeId
+            }
+          }, '*');
+        }
+        activeNote.attachedFrameId = null;
+        activeNote.attachedFrameName = null;
+        activeNote.badgeNodeId = null;
+        saveNotesData();
+        renderAttachmentWidget();
+      }
+    }
+
+    // --- TABLE WIZARD LOGIC ---
+    function initTableWizard() {
+      const grid = document.getElementById('tableWizardGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      for (let r = 1; r <= 5; r++) {
+        for (let c = 1; c <= 5; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'table-wizard-cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          
+          cell.addEventListener('mouseover', () => {
+            updateTableWizardHighlight(r, c);
+          });
+          
+          cell.addEventListener('click', () => {
+            confirmInsertTable(r, c);
+          });
+          
+          grid.appendChild(cell);
+        }
+      }
+    }
+    
+    function updateTableWizardHighlight(maxR, maxC) {
+      document.getElementById('tableWizardSize').textContent = `${maxR} x ${maxC}`;
+      document.getElementById('tableWizardRows').value = maxR;
+      document.getElementById('tableWizardCols').value = maxC;
+      
+      const cells = document.querySelectorAll('.table-wizard-cell');
+      cells.forEach(cell => {
+        const r = parseInt(cell.dataset.row);
+        const c = parseInt(cell.dataset.col);
+        if (r <= maxR && c <= maxC) {
+          cell.classList.add('highlighted');
+        } else {
+          cell.classList.remove('highlighted');
+        }
+      });
+    }
+    
+    function toggleTableWizard() {
+      const wizard = document.getElementById('tableWizard');
+      const tableBtn = document.querySelector('button[title="Insert Table"]');
+      if (!wizard || !tableBtn) return;
+      
+      if (wizard.style.display === 'flex') {
+        wizard.style.display = 'none';
+      } else {
+        wizard.style.display = 'flex';
+        
+        const btnRect = tableBtn.getBoundingClientRect();
+        const containerRect = document.querySelector('.editor-container').getBoundingClientRect();
+        
+        const leftOffset = (btnRect.left + btnRect.width / 2) - containerRect.left;
+        wizard.style.left = `${leftOffset}px`;
+        wizard.style.bottom = `${containerRect.bottom - btnRect.top + 8}px`;
+        
+        updateTableWizardHighlight(3, 2);
+        
+        const closeWizard = (e) => {
+          if (!wizard.contains(e.target) && !tableBtn.contains(e.target)) {
+            wizard.style.display = 'none';
+            document.removeEventListener('click', closeWizard);
+          }
+        };
+        setTimeout(() => document.addEventListener('click', closeWizard), 0);
+      }
+    }
+    
+    function confirmInsertTableCustom() {
+      const rowsInput = document.getElementById('tableWizardRows');
+      const colsInput = document.getElementById('tableWizardCols');
+      const rows = parseInt(rowsInput.value) || 3;
+      const cols = parseInt(colsInput.value) || 2;
+      confirmInsertTable(rows, cols);
+    }
+    
+    function confirmInsertTable(rows, cols) {
+      let html = '<div class="table-container" contenteditable="false">';
+      
+      // Toolbar
+      html += '<div class="table-toolbar">';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, \'up\')" title="Move Up">⬆️ Move Up</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, \'down\')" title="Move Down">⬇️ Move Down</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableRow(this)" title="Add Row Below">➕ Row</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableCol(this)" title="Add Column Right">➕ Col</button>';
+      html += '<button class="table-tool-btn delete" onmousedown="event.preventDefault(); deleteTable(this)" title="Delete Table">🗑️ Delete</button>';
+      html += '</div>';
+      
+      // Scroll Wrapper
+      html += '<div class="table-scroll-wrapper" contenteditable="true">';
+      html += '<table class="editor-table">';
+      
+      // Header row
+      html += '<thead><tr>';
+      for (let c = 1; c <= cols; c++) {
+        html += `<th>Header ${c}</th>`;
+      }
+      html += '</tr></thead>';
+      
+      // Body rows
+      html += '<tbody>';
+      for (let r = 1; r <= rows; r++) {
+        html += '<tr>';
+        for (let c = 1; c <= cols; c++) {
+          html += `<td>Cell ${r}-${c}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table></div></div><p><br></p>';
+      
+      editor.focus();
+      document.execCommand('insertHTML', false, html);
+      handleEditorInput();
+      
+      // Hide wizard
+      const wizard = document.getElementById('tableWizard');
+      if (wizard) {
+        wizard.style.display = 'none';
+      }
+    }
+
+    function getActiveTableCell(table) {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return null;
+      let node = selection.getRangeAt(0).commonAncestorContainer;
+      while (node && node !== table) {
+        if (node.nodeType === Node.ELEMENT_NODE && (node.tagName.toLowerCase() === 'td' || node.tagName.toLowerCase() === 'th')) {
+          return node;
+        }
+        node = node.parentNode;
+      }
+      return null;
+    }
+
+    function moveTable(button, direction) {
+      const container = button.closest('.table-container');
+      if (!container) return;
+      
+      if (direction === 'up') {
+        const prev = container.previousElementSibling;
+        if (prev) {
+          container.parentNode.insertBefore(container, prev);
+        }
+      } else if (direction === 'down') {
+        const next = container.nextElementSibling;
+        if (next) {
+          container.parentNode.insertBefore(container, next.nextSibling);
+        }
+      }
+      handleEditorInput();
+    }
+
+    function addTableRow(button) {
+      const container = button.closest('.table-container');
+      if (!container) return;
+      const table = container.querySelector('table');
+      if (!table) return;
+      
+      const activeCell = getActiveTableCell(table);
+      const activeRow = activeCell ? activeCell.closest('tr') : null;
+      const tbody = table.querySelector('tbody') || table;
+      const lastRow = activeRow || tbody.querySelector('tr:last-child') || table.querySelector('tr:last-child');
+      const colCount = lastRow ? lastRow.querySelectorAll('th, td').length : 2;
+      
+      const newRow = document.createElement('tr');
+      for (let c = 0; c < colCount; c++) {
+        const cell = document.createElement('td');
+        cell.innerHTML = '<br>'; // empty editable cell
+        newRow.appendChild(cell);
+      }
+      
+      if (lastRow) {
+        lastRow.parentNode.insertBefore(newRow, lastRow.nextSibling);
+      } else {
+        tbody.appendChild(newRow);
+      }
+      handleEditorInput();
+    }
+
+    function addTableCol(button) {
+      const container = button.closest('.table-container');
+      if (!container) return;
+      const table = container.querySelector('table');
+      if (!table) return;
+      
+      const activeCell = getActiveTableCell(table);
+      let colIndex = -1;
+      if (activeCell) {
+        colIndex = Array.prototype.indexOf.call(activeCell.parentNode.children, activeCell);
+      }
+      
+      const rows = table.querySelectorAll('tr');
+      rows.forEach((row, r) => {
+        const isHeaderRow = row.parentNode.tagName.toLowerCase() === 'thead' || r === 0;
+        const newCell = document.createElement(isHeaderRow ? 'th' : 'td');
+        newCell.innerHTML = isHeaderRow ? 'Header' : '<br>';
+        
+        const cells = row.querySelectorAll('th, td');
+        if (colIndex >= 0 && colIndex < cells.length) {
+          row.insertBefore(newCell, cells[colIndex].nextSibling);
+        } else {
+          row.appendChild(newCell);
+        }
+      });
+      handleEditorInput();
+    }
+
+    function deleteTable(button) {
+      const container = button.closest('.table-container');
+      if (!container) return;
+      if (confirm('Are you sure you want to delete this table?')) {
+        container.remove();
+        handleEditorInput();
+      }
+    }
+
+
+    // Parse links initially when switching/loading content
+    const originalLoadActiveNoteContent = loadActiveNoteContent;
+    loadActiveNoteContent = function() {
+      originalLoadActiveNoteContent();
+      renderAttachmentWidget();
+      parent.postMessage({ pluginMessage: { type: 'getFrames' } }, '*');
+    };
+
+    // Initialize table wizard grid
+    initTableWizard();
+  </script>
+</body>
+</html>
