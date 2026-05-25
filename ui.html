@@ -1167,6 +1167,11 @@
     }
     
     /* Checklist styles */
+    .editor-textarea .checklist-container {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 8px 0;
+    }
     .editor-textarea .checklist-item {
       display: flex;
       align-items: center;
@@ -1560,6 +1565,9 @@
     // AI Copilot State
     let savedAiRange = null;
 
+    // Table Wizard State
+    let savedTableRange = null;
+
     // Autocomplete Frame Referencing State
     let allFrames = [];
     let filteredFrames = [];
@@ -1573,6 +1581,16 @@
     const appContainer = document.getElementById('appContainer');
     const searchInput = document.getElementById('searchInput');
     const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+
+    // Prevent focus loss when clicking toolbar items
+    const headerToolbar = document.getElementById('headerToolbar');
+    if (headerToolbar) {
+      headerToolbar.addEventListener('mousedown', e => {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+        }
+      });
+    }
 
     // Initialize Plugin - message main thread to request data
     parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
@@ -1892,6 +1910,11 @@
 
     // Close popovers if clicked anywhere outside
     document.addEventListener('click', (e) => {
+      // Skip if clicking inside dropdowns, options, or if target is detached (like standard dropdown options)
+      if (!document.body.contains(e.target) || e.target.tagName === 'OPTION' || e.target.closest('select')) {
+        return;
+      }
+
       if (!e.target.closest('.popover-container')) {
         document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
       }
@@ -2260,26 +2283,24 @@
         }
       }
       
-      const editorRect = editor.getBoundingClientRect();
+      const containerRect = editor.parentNode.getBoundingClientRect();
       let left = 0;
       let top = 0;
       
       if (rect && rect.width > 0 && rect.height > 0) {
-        const x = rect.left - editorRect.left + editor.scrollLeft;
-        const y = rect.bottom - editorRect.top + editor.scrollTop + 4;
-        left = Math.min(x, editor.clientWidth - 210);
-        top = y;
+        left = rect.left - containerRect.left;
+        top = rect.bottom - containerRect.top + 4;
+        left = Math.max(10, Math.min(left, containerRect.width - 220));
       } else {
-        const formattingBar = document.getElementById('formattingBar');
-        if (formattingBar && formattingBar.style.display !== 'none') {
-          const barRect = formattingBar.getBoundingClientRect();
-          const x = barRect.left - editorRect.left + (barRect.width / 2) - 100;
-          const y = barRect.top - editorRect.top - 200;
-          left = Math.max(10, Math.min(x, editor.clientWidth - 210));
-          top = y;
+        const aiBtn = document.getElementById('aiBtn');
+        if (aiBtn) {
+          const btnRect = aiBtn.getBoundingClientRect();
+          const leftOffset = (btnRect.left + btnRect.width / 2) - containerRect.left;
+          left = Math.max(10, Math.min(leftOffset - 100, containerRect.width - 220));
+          top = 8;
         } else {
-          left = (editor.clientWidth - 200) / 2;
-          top = 100;
+          left = (containerRect.width - 200) / 2;
+          top = 8;
         }
       }
       
@@ -2880,25 +2901,41 @@
           const selectedText = range.toString();
           
           const codeNode = document.createElement('code');
-          codeNode.textContent = selectedText || 'code';
           
-          range.deleteContents();
-          range.insertNode(codeNode);
-          
-          range.setStartAfter(codeNode);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
+          if (!selectedText) {
+            codeNode.textContent = 'code';
+            range.deleteContents();
+            range.insertNode(codeNode);
+            
+            const newRange = document.createRange();
+            newRange.selectNodeContents(codeNode);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+          } else {
+            codeNode.textContent = selectedText;
+            range.deleteContents();
+            range.insertNode(codeNode);
+            
+            range.setStartAfter(codeNode);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
         }
       } else if (type === 'link') {
         showLinkPopoverAtSelection();
-      }
       } else if (type === 'bullet') {
         document.execCommand('insertUnorderedList', false, null);
       } else if (type === 'number') {
         document.execCommand('insertOrderedList', false, null);
       } else if (type === 'checkbox') {
-        const checkboxHtml = `<ul class="checklist-container"><li class="checklist-item"><input type="checkbox"> <span>Checklist item</span></li></ul>`;
+        const selection = window.getSelection();
+        let selectedText = '';
+        if (selection.rangeCount) {
+          selectedText = selection.getRangeAt(0).toString().trim();
+        }
+        const textToUse = selectedText || 'Checklist item';
+        const checkboxHtml = `<ul class="checklist-container"><li class="checklist-item"><input type="checkbox"> <span>${escapeHtml(textToUse)}</span></li></ul>`;
         document.execCommand('insertHTML', false, checkboxHtml);
       } else if (type === 'quote') {
         document.execCommand('formatBlock', false, 'blockquote');
@@ -2952,7 +2989,14 @@
       }
       
       if (!savedLinkRange) {
-        return;
+        editor.focus();
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        savedLinkRange = range;
+        
+        selection.removeAllRanges();
+        selection.addRange(savedLinkRange);
       }
       
       const containerRect = editor.parentNode.getBoundingClientRect();
@@ -2971,8 +3015,16 @@
         left = Math.min(x, editor.clientWidth - 250);
         top = y;
       } else {
-        left = (editor.clientWidth - 240) / 2;
-        top = 100;
+        const linkBtn = document.querySelector('button[title="Insert Link"]');
+        if (linkBtn) {
+          const btnRect = linkBtn.getBoundingClientRect();
+          const leftOffset = (btnRect.left + btnRect.width / 2) - containerRect.left;
+          left = Math.max(10, Math.min(leftOffset - 120, containerRect.width - 250));
+          top = 8;
+        } else {
+          left = (editor.clientWidth - 240) / 2;
+          top = 8;
+        }
       }
       
       popover.style.left = `${Math.max(10, left)}px`;
@@ -3421,6 +3473,23 @@
       if (wizard.style.display === 'flex') {
         wizard.style.display = 'none';
       } else {
+        // Save selection range before opening the wizard
+        const selection = window.getSelection();
+        if (selection.rangeCount) {
+          const range = selection.getRangeAt(0);
+          let node = range.commonAncestorContainer;
+          while (node && node !== editor) {
+            node = node.parentNode;
+          }
+          if (node === editor) {
+            savedTableRange = range.cloneRange();
+          } else {
+            savedTableRange = null;
+          }
+        } else {
+          savedTableRange = null;
+        }
+
         wizard.style.display = 'flex';
         
         const btnRect = tableBtn.getBoundingClientRect();
@@ -3429,11 +3498,14 @@
         const leftOffset = (btnRect.left + btnRect.width / 2) - containerRect.left;
         wizard.style.left = `${Math.max(10, Math.min(leftOffset - 85, containerRect.width - 180))}px`;
         wizard.style.bottom = 'auto';
-        wizard.style.top = `${btnRect.bottom - containerRect.top + 8}px`;
+        wizard.style.top = '8px'; // Position exactly below the toolbar (at top of the editor container)
         
         updateTableWizardHighlight(3, 2);
         
         const closeWizard = (e) => {
+          if (!document.body.contains(e.target) || e.target.tagName === 'OPTION' || e.target.closest('select')) {
+            return;
+          }
           if (!wizard.contains(e.target) && !tableBtn.contains(e.target)) {
             wizard.style.display = 'none';
             document.removeEventListener('click', closeWizard);
@@ -3452,6 +3524,20 @@
     }
     
     function confirmInsertTable(rows, cols) {
+      // Restore range if saved
+      const selection = window.getSelection();
+      if (savedTableRange) {
+        selection.removeAllRanges();
+        selection.addRange(savedTableRange);
+      } else {
+        editor.focus();
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
       let html = '<div class="table-container" contenteditable="false">';
       
       // Toolbar
