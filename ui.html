@@ -8,10 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <style>
     :root {
-      /* Cream/Beige Theme variables */
+      /* Fallback variables */
       --bg-editor: #FAF9F5;
       --bg-sidebar: #EFEFEA;
       --bg-hover: #E5E5DE;
@@ -23,6 +25,69 @@
       --border-color: #E2E2D9;
       --font-family: 'Inter', system-ui, -apple-system, sans-serif;
       --transition-speed: 0.2s;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      
+      --bg-cell: #FFFFFF;
+      --bg-cell-alternate: #FAF9F5;
+      --bg-header: #1C1917;
+      --color-header: #FAF9F5;
+    }
+
+    /* Cream/Coffee Theme (Default) */
+    body.theme-cream {
+      --bg-editor: #FAF9F5;
+      --bg-sidebar: #EFEFEA;
+      --bg-hover: #E5E5DE;
+      --bg-active: #DADAD2;
+      --color-text: #242220;
+      --color-text-muted: #7E7972;
+      --color-accent: #E2871A;
+      --color-accent-rgb: 226, 135, 26;
+      --border-color: #E2E2D9;
+      
+      --bg-cell: #FFFFFF;
+      --bg-cell-alternate: #FAF9F5;
+      --bg-header: #1C1917;
+      --color-header: #FAF9F5;
+    }
+
+    /* Midnight Focus Theme */
+    body.theme-midnight {
+      --bg-editor: #0F172A;
+      --bg-sidebar: #1E293B;
+      --bg-hover: #334155;
+      --bg-active: #475569;
+      --color-text: #F1F5F9;
+      --color-text-muted: #94A3B8;
+      --color-accent: #3B82F6;
+      --color-accent-rgb: 59, 130, 246;
+      --border-color: #334155;
+      
+      --bg-cell: #1E293B;
+      --bg-cell-alternate: #0F172A;
+      --bg-header: #020617;
+      --color-header: #F1F5F9;
+    }
+
+    /* Nordic Mist Theme */
+    body.theme-nordic {
+      --bg-editor: #F8FAFC;
+      --bg-sidebar: #F1F5F9;
+      --bg-hover: #E2E8F0;
+      --bg-active: #CBD5E1;
+      --color-text: #0F172A;
+      --color-text-muted: #64748B;
+      --color-accent: #0F766E;
+      --color-accent-rgb: 15, 118, 110;
+      --border-color: #CBD5E1;
+      
+      --bg-cell: #FFFFFF;
+      --bg-cell-alternate: #F8FAFC;
+      --bg-header: #0F766E;
+      --color-header: #F8FAFC;
     }
 
     * {
@@ -86,88 +151,45 @@
       white-space: nowrap;
     }
 
-    .header-tabs {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      height: 100%;
-      overflow-x: auto;
-      scrollbar-width: none; /* Hide scrollbar for Firefox */
-      gap: 4px;
-      padding-top: 6px;
-    }
-
-    .header-tabs::-webkit-scrollbar {
-      display: none; /* Hide scrollbar for Chrome/Safari */
-    }
-
-    .tab {
+    .header-toolbar {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
+      gap: 2px;
       background-color: var(--bg-hover);
+      padding: 4px 6px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
-      border-bottom: none;
-      border-radius: 6px 6px 0 0;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      color: var(--color-text-muted);
-      max-width: 150px;
-      transition: all var(--transition-speed) ease;
-      position: relative;
-      bottom: -1px;
     }
-
-    .tab.active {
-      background-color: var(--bg-editor);
-      color: var(--color-text);
-      font-weight: 600;
-      border-color: var(--border-color);
-      border-bottom: 1px solid var(--bg-editor);
-      z-index: 2;
-    }
-
-    .tab-title {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .tab-close {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      color: var(--color-text-muted);
-      transition: background var(--transition-speed);
-    }
-
-    .tab-close:hover {
-      background-color: var(--bg-active);
-      color: var(--color-text);
-    }
-
-    .tab-add {
+    
+    .toolbar-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 28px;
       height: 28px;
       border-radius: 6px;
-      cursor: pointer;
+      border: none;
+      background: transparent;
       color: var(--color-text-muted);
-      transition: background var(--transition-speed);
-      margin-bottom: 4px;
-      margin-left: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all var(--transition-speed);
     }
-
-    .tab-add:hover {
-      background-color: var(--bg-hover);
+    
+    .toolbar-btn:hover {
+      background-color: var(--bg-active);
       color: var(--color-text);
+    }
+    
+    .toolbar-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .toolbar-divider {
+      width: 1px;
+      height: 16px;
+      background-color: var(--border-color);
+      margin: 0 4px;
     }
 
     .header-controls {
@@ -214,7 +236,7 @@
       padding: 12px;
       justify-content: space-between;
       transition: width var(--transition-speed) ease;
-      overflow: hidden;
+      overflow: visible;
       user-select: none;
     }
 
@@ -441,6 +463,7 @@
     /* --- EDITOR AREA --- */
     .editor-container {
       flex: 1;
+      min-width: 0;
       height: 100%;
       position: relative;
       background-color: var(--bg-editor);
@@ -452,9 +475,11 @@
       flex: 1;
       width: 100%;
       height: 100%;
+      min-width: 0;
+      max-width: 100%;
       border: none;
       background-color: transparent;
-      padding: 56px 24px 90px 24px;
+      padding: 24px 32px 32px 32px;
       font-size: 15px;
       line-height: 1.6;
       color: var(--color-text);
@@ -464,6 +489,11 @@
       text-align: left;
     }
 
+    #themeSelect option {
+      background-color: var(--bg-editor);
+      color: var(--color-text);
+    }
+
     .editor-textarea:empty::before {
       content: attr(placeholder);
       color: var(--color-text-muted);
@@ -471,53 +501,134 @@
       pointer-events: none;
     }
 
-    /* Floating Formatting Bar */
-    .formatting-bar {
+
+
+    /* AI Popover Styles */
+    .ai-popover {
       position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 8px;
-      border-radius: 24px;
-      background-color: #1C1917; /* Dark stone/charcoal matching copy button */
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-      transition: opacity var(--transition-speed), transform var(--transition-speed);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      user-select: none;
+      background-color: var(--bg-editor);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      width: 200px;
+      display: none;
+      flex-direction: column;
+      padding: 8px;
+      z-index: 1002;
+      animation: popoverFade 0.15s ease-out;
     }
     
-    .formatting-bar-btn {
+    .ai-popover-header {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      padding: 2px 4px;
+    }
+    
+    .ai-popover-options {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .ai-popover-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      color: #D6D3D1; /* Lighter warm stone text */
+      padding: 6px 8px;
+      font-size: 12px;
+      font-weight: 500;
       background: transparent;
       border: none;
+      border-radius: 4px;
+      color: var(--color-text);
       cursor: pointer;
-      transition: all var(--transition-speed);
+      text-align: left;
+      transition: background-color var(--transition-speed);
     }
-
-    .formatting-bar-btn:hover {
-      background-color: rgba(255, 255, 255, 0.12);
+    
+    .ai-popover-btn:hover {
+      background-color: var(--bg-hover);
+    }
+    
+    .ai-popover-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 6px 0;
+    }
+    
+    .ai-popover-custom {
+      display: flex;
+      gap: 4px;
+      padding: 2px 4px;
+    }
+    
+    .ai-popover-custom input {
+      flex: 1;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-sidebar);
+      color: var(--color-text);
+      font-size: 11px;
+      outline: none;
+    }
+    
+    .ai-popover-custom input:focus {
+      border-color: var(--color-accent);
+    }
+    
+    .ai-popover-submit-btn {
+      padding: 4px 8px;
+      background-color: var(--color-accent);
       color: #FAF9F5;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
     }
-
-    .formatting-bar-btn:active {
-      transform: scale(0.9);
+    
+    .ai-popover-submit-btn:hover {
+      opacity: 0.9;
     }
-
-    .formatting-bar-divider {
-      width: 1px;
-      height: 18px;
-      background-color: rgba(255, 255, 255, 0.15);
-      margin: 0 4px;
+    
+    /* Loading state overlay */
+    .ai-popover-loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(var(--color-accent-rgb), 0.05);
+      backdrop-filter: blur(1px);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      z-index: 10;
+    }
+    
+    .ai-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--color-accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    .ai-popover-loading span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* Click to Jump Tooltip */
@@ -563,41 +674,6 @@
       margin: 0 2px;
     }
 
-    /* Floaty Copy Button */
-    .copy-btn {
-      position: absolute;
-      bottom: 24px;
-      right: 24px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 20px;
-      background-color: #1C1917; /* Dark stone */
-      color: #FAF9F5;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      box-shadow: var(--shadow-md);
-      transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
-      user-select: none;
-      z-index: 10;
-    }
-
-    .copy-btn:hover {
-      background-color: #2D2A26;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .copy-btn:active {
-      transform: translateY(0);
-    }
-
-    .copy-btn.copied {
-      background-color: #16A34A; /* Green success */
-    }
 
     /* --- COLLAPSED STATE STYLING --- */
     .sidebar-collapsed .sidebar {
@@ -863,21 +939,19 @@
     /* --- TABLE WIZARD POPOVER --- */
     .table-wizard {
       position: absolute;
-      bottom: 74px; /* above formatting bar */
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #1C1917; /* Dark stone to match formatting bar */
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      background-color: var(--bg-editor);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
       padding: 12px;
-      z-index: 100;
+      z-index: 1002;
       display: none;
       flex-direction: column;
       gap: 8px;
-      color: #FAF9F5;
+      color: var(--color-text);
       width: 170px;
       user-select: none;
+      animation: popoverFade 0.15s ease-out;
     }
     
     .table-wizard-header {
@@ -886,7 +960,7 @@
       align-items: center;
       font-size: 11px;
       font-weight: 600;
-      color: #A8A29E;
+      color: var(--color-text-muted);
     }
     
     .table-wizard-grid {
@@ -899,11 +973,11 @@
     .table-wizard-cell {
       width: 24px;
       height: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid var(--border-color);
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.1s ease;
-      background-color: rgba(255, 255, 255, 0.03);
+      background-color: var(--bg-sidebar);
     }
     
     .table-wizard-cell.highlighted {
@@ -915,7 +989,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid var(--border-color);
       padding-top: 8px;
       margin-top: 4px;
     }
@@ -923,10 +997,10 @@
     .table-wizard-input {
       width: 32px;
       height: 20px;
-      background-color: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
       border-radius: 4px;
-      color: #FAF9F5;
+      color: var(--color-text);
       text-align: center;
       font-size: 10px;
       outline: none;
@@ -953,41 +1027,69 @@
       opacity: 0.9;
     }
 
-    /* --- EDITOR MODE TOGGLE STYLE --- */
-    .editor-mode-toggle {
+    /* Link Popover Styles */
+    .link-popover {
       position: absolute;
-      top: 14px;
-      left: 24px;
-      z-index: 20;
-      display: flex;
-      background-color: var(--bg-sidebar);
+      background-color: var(--bg-editor);
       border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 2px;
-      gap: 2px;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      width: 240px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      z-index: 1002;
+      animation: popoverFade 0.15s ease-out;
     }
-    .toggle-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
+    .link-popover-title {
+      font-size: 10px;
+      font-weight: 700;
       color: var(--color-text-muted);
-      background: transparent;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all var(--transition-speed);
+      text-transform: uppercase;
+    }
+    .link-popover-input {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-sidebar);
+      color: var(--color-text);
+      font-size: 11px;
       outline: none;
     }
-    .toggle-btn:hover {
-      color: var(--color-text);
+    .link-popover-input:focus {
+      border-color: var(--color-accent);
     }
-    .toggle-btn.active {
-      background-color: var(--bg-editor);
-      color: var(--color-text);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    .link-popover-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    .link-popover-btn {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity var(--transition-speed);
+    }
+    .link-popover-btn:hover {
+      opacity: 0.9;
+    }
+    .link-popover-btn.apply {
+      background-color: var(--color-accent);
+      color: #FAF9F5;
+    }
+    .link-popover-btn.cancel {
+      background: transparent;
+      color: var(--color-text-muted);
+    }
+    .link-popover-btn.remove {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: #DC2626;
+      margin-right: auto;
     }
 
     /* --- EDITOR RICH TEXT ELEMENTS --- */
@@ -1041,8 +1143,8 @@
       text-decoration: underline;
     }
     .editor-textarea a.frame-link {
-      background-color: rgba(226, 135, 26, 0.08);
-      border: 1px solid rgba(226, 135, 26, 0.15);
+      background-color: rgba(var(--color-accent-rgb), 0.08);
+      border: 1px solid rgba(var(--color-accent-rgb), 0.15);
       padding: 2px 6px;
       border-radius: 4px;
       display: inline-flex;
@@ -1052,12 +1154,16 @@
       transition: all var(--transition-speed);
     }
     .editor-textarea a.frame-link:hover {
-      background-color: rgba(226, 135, 26, 0.15);
+      background-color: rgba(var(--color-accent-rgb), 0.15);
       text-decoration: none;
     }
     .editor-textarea a.frame-link::before {
-      content: '📝';
+      content: '\f0c1'; /* Font Awesome Link Icon */
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
       font-size: 10px;
+      margin-right: 4px;
+      color: var(--color-accent);
     }
     
     /* Checklist styles */
@@ -1081,6 +1187,8 @@
       padding: 8px;
       background-color: var(--bg-sidebar);
       transition: border-color var(--transition-speed);
+      max-width: 100%;
+      box-sizing: border-box;
     }
     .editor-textarea .table-container:hover {
       border-color: var(--color-accent);
@@ -1126,7 +1234,9 @@
 
     /* Table styling inside the editor itself */
     .editor-textarea table {
-      width: 100%;
+      min-width: 100%;
+      width: max-content;
+      table-layout: auto;
       border-collapse: collapse;
       font-size: 13px;
       text-align: left;
@@ -1137,20 +1247,22 @@
       overflow: hidden;
     }
     .editor-textarea th {
-      background-color: #1C1917; /* Dark stone header */
-      color: #FAF9F5;
+      background-color: var(--bg-header);
+      color: var(--color-header);
       font-weight: 600;
       padding: 10px 12px;
-      border: 1px solid #2D2A26;
+      border: 1px solid var(--border-color);
+      min-width: 120px;
     }
     .editor-textarea td {
       padding: 10px 12px;
       border: 1px solid var(--border-color);
-      background-color: #FFFFFF;
+      background-color: var(--bg-cell);
       color: var(--color-text);
+      min-width: 120px;
     }
     .editor-textarea tr:nth-child(even) td {
-      background-color: #FAF9F5; /* alternating rows */
+      background-color: var(--bg-cell-alternate); /* alternating rows */
     }
   </style>
 </head>
@@ -1159,32 +1271,60 @@
     <!-- TOP HEADER -->
     <header class="app-header">
       <div class="header-left" id="headerLeft">
-        <span class="app-logo" onclick="toggleSidebar()">
-          <!-- Custom bars logo -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <path d="M4 18V6M9 18V12M14 18V9M19 18V4"/>
-          </svg>
+        <span class="app-logo" onclick="toggleSidebar()" title="Toggle Sidebar">
+          <i class="fa-solid fa-columns" style="font-size: 14px;"></i>
         </span>
         <span class="app-title">Simple Notes</span>
       </div>
 
-      <!-- TABS -->
-      <div class="header-tabs" id="tabsContainer">
-        <!-- Tabs injected by JS -->
-      </div>
-      <div class="tab-add" onclick="createNewNote()" title="New note in new tab">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
+      <!-- FORMATTING TOOLBAR -->
+      <div class="header-toolbar" id="headerToolbar">
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('bold')" title="Bold (Ctrl+B)">
+          <i class="fa-solid fa-bold"></i>
+        </button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('italic')" title="Italic (Ctrl+I)">
+          <i class="fa-solid fa-italic"></i>
+        </button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('underline')" title="Underline (Ctrl+U)">
+          <i class="fa-solid fa-underline"></i>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('code')" title="Inline Code">
+          <i class="fa-solid fa-code"></i>
+        </button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('link')" title="Insert Link">
+          <i class="fa-solid fa-link"></i>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('bullet')" title="Bullet List">
+          <i class="fa-solid fa-list-ul"></i>
+        </button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('number')" title="Numbered List">
+          <i class="fa-solid fa-list-ol"></i>
+        </button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('checkbox')" title="Checklist">
+          <i class="fa-solid fa-list-check"></i>
+        </button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('quote')" title="Blockquote">
+          <i class="fa-solid fa-quote-left"></i>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('table')" title="Insert Table">
+          <i class="fa-solid fa-table"></i>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="toolbar-btn" id="aiBtn" onmousedown="event.preventDefault()" onclick="toggleAiPopover(event)" title="Gemini AI Copilot">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--color-accent);"></i>
+        </button>
       </div>
 
       <!-- WINDOW CONTROLS -->
       <div class="header-controls">
+        <button class="control-btn" onclick="createNewNote()" title="New Note">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
         <button class="control-btn" id="resizeBtn" onclick="toggleWindowSize()" title="Toggle window size">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-          </svg>
+          <i class="fa-solid fa-expand"></i>
         </button>
       </div>
     </header>
@@ -1193,35 +1333,16 @@
       <!-- SIDEBAR -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-top">
-          <!-- Collapse/Expand Sidebar Action -->
-          <button class="sidebar-action-btn" onclick="toggleSidebar()" title="Collapse Notes list">
-            <span class="icon" style="display: flex;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-              </svg>
-            </span>
-            <span class="menu-text">Collapse Notes</span>
-          </button>
-
-          <!-- New Note Action -->
-          <button class="sidebar-action-btn" onclick="createNewNote()" title="Create new note">
-            <span class="icon" style="display: flex;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </span>
-            <span class="menu-text">New note</span>
-          </button>
+          <!-- Sidebar Header -->
+          <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center; padding: 4px 12px 8px 12px;">
+            <h2 style="font-size: 16px; font-weight: 700; color: var(--color-text);">Notes</h2>
+            <span id="sidebarNoteCount" style="font-size: 11px; color: var(--color-text-muted); font-weight: 500;"></span>
+          </div>
 
           <!-- Search Notes Box -->
           <div class="search-wrapper">
             <div class="search-icon" onclick="expandSidebarIfCollapsed()" title="Search notes">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
+              <i class="fa-solid fa-magnifying-glass" style="font-size: 12px;"></i>
             </div>
             <input type="text" class="search-input" id="searchInput" placeholder="Search notes..." oninput="handleSearch()">
           </div>
@@ -1238,12 +1359,9 @@
         <div class="sidebar-bottom">
           <!-- Transforms Popover -->
           <div class="popover-container">
-            <button class="sidebar-action-btn" onclick="togglePopover('transformsMenu', event)" title="Transforms">
+            <button class="sidebar-action-btn" onclick="toggleCustomPopover('transformsMenu', event)" title="Transforms">
               <span class="icon" style="display: flex;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="12 2 2 22 22 22"/>
-                  <path d="M12 2v20M2 22h20"/>
-                </svg>
+                <i class="fa-solid fa-arrows-spin" style="font-size: 14px;"></i>
               </span>
               <span class="menu-text">Transforms</span>
             </button>
@@ -1274,13 +1392,9 @@
 
           <!-- Formatting Popover -->
           <div class="popover-container">
-            <button class="sidebar-action-btn" onclick="togglePopover('formattingMenu', event)" title="Formatting">
+            <button class="sidebar-action-btn" onclick="toggleCustomPopover('formattingMenu', event)" title="Formatting">
               <span class="icon" style="display: flex;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="4 7 4 4 20 4 20 7"/>
-                  <line x1="9" y1="20" x2="15" y2="20"/>
-                  <line x1="12" y1="4" x2="12" y2="20"/>
-                </svg>
+                <i class="fa-solid fa-font" style="font-size: 14px;"></i>
               </span>
               <span class="menu-text">Formatting</span>
             </button>
@@ -1319,9 +1433,34 @@
                 </button>
              </div>
            </div>
+
+           <!-- Settings Popover -->
+           <div class="popover-container">
+             <button class="sidebar-action-btn" onclick="toggleCustomPopover('settingsMenu', event)" title="Settings">
+               <span class="icon" style="display: flex;">
+                 <i class="fa-solid fa-gear" style="font-size: 14px;"></i>
+               </span>
+               <span class="menu-text">Settings</span>
+             </button>
+             <div class="popover-menu" id="settingsMenu" style="padding: 12px; flex-direction: column; gap: 10px;">
+               <div style="font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 2px;">Theme</div>
+               <select id="themeSelect" onchange="changeTheme(this.value)" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-editor); color: var(--color-text); font-size: 12px; cursor: pointer; outline: none;">
+                 <option value="cream">Cream & Coffee</option>
+                 <option value="midnight">Midnight Focus</option>
+                 <option value="nordic">Nordic Mist</option>
+               </select>
+               
+               <div class="sidebar-divider" style="margin: 6px 0;"></div>
+               
+               <div style="font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 2px;">Gemini API Key</div>
+               <input type="password" id="geminiApiKey" placeholder="AI Key (Gemini API)..." oninput="changeGeminiApiKey(this.value)" style="width: 100%; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-editor); color: var(--color-text); font-size: 11px; outline: none;" />
+               <div style="font-size: 9px; color: var(--color-text-muted); line-height: 1.2;">Your key is stored locally in your Figma workspace client storage.</div>
+             </div>
+           </div>
          </div>
        </aside>
        <main class="editor-container">
+        <div id="editorNoteDate" style="text-align: center; font-size: 11px; color: var(--color-text-muted); margin-top: 16px; margin-bottom: -8px; font-weight: 500; user-select: none;"></div>
         <div 
           class="editor-textarea" 
           id="editor" 
@@ -1355,111 +1494,54 @@
         <!-- Autocomplete dropdown -->
         <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
 
-        <!-- Floaty Copy Button -->
-        <button class="copy-btn" id="copyBtn" onclick="copyNoteContent()">
-          <span id="copyIcon" style="display: flex;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-          </span>
-          <span id="copyText">Copy</span>
-        </button>
+        <!-- AI Popover -->
+        <div class="ai-popover" id="aiPopover">
+          <div class="ai-popover-header">Gemini AI Copilot</div>
+          <div class="ai-popover-options">
+            <button class="ai-popover-btn" onmousedown="event.preventDefault(); runAiAction('improve')"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 8px; color: var(--color-accent); width: 14px; text-align: center;"></i>Improve Writing</button>
+            <button class="ai-popover-btn" onmousedown="event.preventDefault(); runAiAction('summarize')"><i class="fa-solid fa-compress" style="margin-right: 8px; color: var(--color-accent); width: 14px; text-align: center;"></i>Summarize Note</button>
+            <button class="ai-popover-btn" onmousedown="event.preventDefault(); runAiAction('table')"><i class="fa-solid fa-table" style="margin-right: 8px; color: var(--color-accent); width: 14px; text-align: center;"></i>Convert to Table</button>
+            <button class="ai-popover-btn" onmousedown="event.preventDefault(); runAiAction('casual')"><i class="fa-solid fa-face-smile" style="margin-right: 8px; color: var(--color-accent); width: 14px; text-align: center;"></i>Make Casual</button>
+            <button class="ai-popover-btn" onmousedown="event.preventDefault(); runAiAction('professional')"><i class="fa-solid fa-briefcase" style="margin-right: 8px; color: var(--color-accent); width: 14px; text-align: center;"></i>Make Professional</button>
+          </div>
+          <div class="ai-popover-divider"></div>
+          <div class="ai-popover-custom">
+            <input type="text" id="aiCustomPrompt" placeholder="Ask AI anything..." onkeydown="handleAiCustomPromptKey(event)" />
+            <button class="ai-popover-submit-btn" onmousedown="event.preventDefault(); runAiAction('custom')">Go</button>
+          </div>
+          <div class="ai-popover-loading" id="aiPopoverLoading" style="display: none;">
+            <div class="ai-spinner"></div>
+            <span>Generating...</span>
+          </div>
+        </div>
+
+
+        <!-- Link Popover -->
+        <div class="link-popover" id="linkPopover">
+          <div class="link-popover-title">Edit Link</div>
+          <input type="text" class="link-popover-input" id="linkPopoverUrl" placeholder="Enter URL (https://... or @Frame)..." />
+          <input type="text" class="link-popover-input" id="linkPopoverText" placeholder="Link text..." />
+          <div class="link-popover-buttons">
+            <button class="link-popover-btn remove" id="linkPopoverRemoveBtn" onclick="removeLinkPopover()">Remove</button>
+            <button class="link-popover-btn cancel" onclick="closeLinkPopover()">Cancel</button>
+            <button class="link-popover-btn apply" onclick="applyLinkPopover()">Save</button>
+          </div>
+        </div>
 
         <!-- Floating Link Click-to-Jump Tooltip -->
         <div class="link-tooltip" id="linkTooltip">
           <button class="link-tooltip-btn" id="tooltipJumpBtn" title="Jump to Frame in Canvas">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a10 10 0 0 0-10 10c0 5.25 10 12 10 12s10-6.75 10-12a10 10 0 0 0-10-10z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
+            <i class="fa-solid fa-location-crosshairs" style="font-size: 12px;"></i>
             <span>Jump to Frame</span>
           </button>
           <div class="link-tooltip-divider"></div>
-          <button class="link-tooltip-btn" id="tooltipOpenBtn" title="Open URL in Browser">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
+          <a class="link-tooltip-btn" id="tooltipOpenBtn" target="_blank" title="Open URL in Browser" style="text-decoration: none;">
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 12px;"></i>
             <span>Open URL</span>
-          </button>
+          </a>
         </div>
 
-        <!-- Floating Formatting Bar -->
-        <div class="formatting-bar" id="formattingBar">
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('bold')" title="Bold (Ctrl+B)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
-              <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
-            </svg>
-          </button>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('italic')" title="Italic (Ctrl+I)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="4" x2="10" y2="4"/>
-              <line x1="14" y1="20" x2="5" y2="20"/>
-              <line x1="15" y1="4" x2="9" y2="20"/>
-            </svg>
-          </button>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('underline')" title="Underline (Ctrl+U)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/>
-              <line x1="4" y1="21" x2="20" y2="21"/>
-            </svg>
-          </button>
-          <div class="formatting-bar-divider"></div>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('code')" title="Inline Code">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"/>
-              <polyline points="8 6 2 12 8 18"/>
-            </svg>
-          </button>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('link')" title="Insert Link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-            </svg>
-          </button>
-          <div class="formatting-bar-divider"></div>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('bullet')" title="Bullet List">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="9" y1="6" x2="20" y2="6"/>
-              <line x1="9" y1="12" x2="20" y2="12"/>
-              <line x1="9" y1="18" x2="20" y2="18"/>
-              <line x1="5" y1="6" x2="5.01" y2="6"/>
-              <line x1="5" y1="12" x2="5.01" y2="12"/>
-              <line x1="5" y1="18" x2="5.01" y2="18"/>
-            </svg>
-          </button>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('number')" title="Numbered List">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="10" y1="6" x2="21" y2="6"/>
-              <line x1="10" y1="12" x2="21" y2="12"/>
-              <line x1="10" y1="18" x2="21" y2="18"/>
-              <path d="M4 6h1v4"/>
-              <path d="M4 10h2"/>
-              <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>
-            </svg>
-          </button>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('checkbox')" title="Checklist">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <path d="m9 11 3 3 5-5"/>
-            </svg>
-          </button>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('quote')" title="Blockquote">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </button>
-          <div class="formatting-bar-divider"></div>
-          <button class="formatting-bar-btn" onmousedown="event.preventDefault()" onclick="applyFormat('table')" title="Insert Table">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <path d="M21 9H3M21 15H3M12 3v18"/>
-            </svg>
-          </button>
-        </div>
+
       </main>
     </div>
   </div>
@@ -1467,12 +1549,16 @@
   <script>
     // Plugin State
     let notes = [];
+    let currentTheme = 'cream';
+    let geminiApiKey = '';
     let activeNoteId = null;
-    let openTabIds = []; // Tabs that are currently open in the tab bar
     let isSidebarCollapsed = false;
     let isWindowLarge = false;
     let searchFilter = '';
     let saveTimeout = null;
+
+    // AI Copilot State
+    let savedAiRange = null;
 
     // Autocomplete Frame Referencing State
     let allFrames = [];
@@ -1484,7 +1570,6 @@
 
     const editor = document.getElementById('editor');
     const notesList = document.getElementById('notesList');
-    const tabsContainer = document.getElementById('tabsContainer');
     const appContainer = document.getElementById('appContainer');
     const searchInput = document.getElementById('searchInput');
     const autocompleteDropdown = document.getElementById('autocompleteDropdown');
@@ -1504,8 +1589,14 @@
         const settings = msg.settings || {};
         isSidebarCollapsed = !!settings.sidebarCollapsed;
         isWindowLarge = !!settings.windowLarge;
-        openTabIds = settings.openTabs || [];
         activeNoteId = settings.activeNoteId || null;
+        currentTheme = settings.theme || 'cream';
+        geminiApiKey = settings.geminiApiKey || '';
+
+        // Apply theme visual state
+        applyThemeClass(currentTheme);
+        document.getElementById('themeSelect').value = currentTheme;
+        document.getElementById('geminiApiKey').value = geminiApiKey;
 
         // Apply visual states based on loaded settings
         if (isSidebarCollapsed) {
@@ -1513,11 +1604,7 @@
         }
         
         if (isWindowLarge) {
-          document.getElementById('resizeBtn').innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
-            </svg>
-          `;
+          document.getElementById('resizeBtn').innerHTML = `<i class="fa-solid fa-compress"></i>`;
         }
 
         // If no notes exist, initialize with a welcome note
@@ -1525,26 +1612,20 @@
           const welcomeNote = {
             id: 'welcome-note',
             title: 'Welcome to Simple Notes',
-            content: 'Welcome to Simple Notes!\n\nThis is a simple, modern note-taking plugin inspired by Wispr Scratchpad. It auto-saves your thoughts as you write.\n\nHere are some features you can try:\n\n• Renaming: Edit the first line of the note, it auto-updates the title.\n• Tabs: Create new notes using the + button at the top.\n• Canvas: Open the "Transforms" menu below and select "Insert to Canvas" to write this note directly onto your Figma board!\n• Formatting: Use the bottom menu to easily format text as Bold, Italic, lists, etc.\n\nEnjoy writing!',
+            content: 'Welcome to Simple Notes!\n\nThis is a simple, modern note-taking plugin inspired by Apple Notes. It auto-saves your thoughts as you write.\n\nHere are some features you can try:\n\n• Renaming: Edit the first line of the note, it auto-updates the title.\n• Canvas: Open the "Transforms" menu below and select "Insert to Canvas" to write this note directly onto your Figma board!\n• Formatting: Use the toolbar at the top to easily format text as Bold, Italic, lists, tables, etc.\n\nEnjoy writing!',
             updatedAt: Date.now()
           };
           notes.push(welcomeNote);
           activeNoteId = welcomeNote.id;
-          openTabIds = [welcomeNote.id];
           saveNotesData();
         }
 
-        // Validate tab lists
-        openTabIds = openTabIds.filter(id => notes.some(n => n.id === id));
-        if (openTabIds.length === 0) {
-          openTabIds = [notes[0].id];
-        }
+        // Validate active note
         if (!activeNoteId || !notes.some(n => n.id === activeNoteId)) {
-          activeNoteId = openTabIds[0];
+          activeNoteId = notes[0] ? notes[0].id : null;
         }
 
         renderSidebar();
-        renderTabs();
         loadActiveNoteContent();
       } else if (msg.type === 'framesList') {
         allFrames = msg.frames || [];
@@ -1610,14 +1691,11 @@
       };
       notes.unshift(newNote); // Put it at the top
       
-      // Add to open tabs and set active
-      openTabIds.push(newId);
       activeNoteId = newId;
 
       saveNotesData();
       saveSettingsData();
       renderSidebar();
-      renderTabs();
       loadActiveNoteContent();
       
       editor.focus();
@@ -1627,15 +1705,11 @@
       if (event) event.stopPropagation();
       
       notes = notes.filter(n => n.id !== id);
-      openTabIds = openTabIds.filter(tid => tid !== id);
 
       // If we deleted the active note, set a new active note
       if (activeNoteId === id) {
-        if (openTabIds.length > 0) {
-          activeNoteId = openTabIds[openTabIds.length - 1];
-        } else if (notes.length > 0) {
+        if (notes.length > 0) {
           activeNoteId = notes[0].id;
-          openTabIds = [activeNoteId];
         } else {
           // If no notes exist anymore, create a fresh one
           createNewNote();
@@ -1646,15 +1720,13 @@
       saveNotesData();
       saveSettingsData();
       renderSidebar();
-      renderTabs();
       loadActiveNoteContent();
     }
 
     function selectNote(id) {
       activeNoteId = id;
-      if (!openTabIds.includes(id)) {
-        openTabIds.push(id);
-      }
+      saveSettingsData();
+      renderSidebar();
       saveSettingsData();
       renderTabs();
       renderSidebar();
@@ -1667,308 +1739,32 @@
       renderSidebar();
     }
 
-    // --- TAB ACTIONS ---
-
-    function selectTab(id) {
-      activeNoteId = id;
-      saveSettingsData();
-      renderTabs();
-      renderSidebar();
-      loadActiveNoteContent();
-      editor.focus();
-    }
-
-    function closeTab(id, event) {
-      if (event) event.stopPropagation();
-      
-      openTabIds = openTabIds.filter(tid => tid !== id);
-      
-      if (activeNoteId === id) {
-        if (openTabIds.length > 0) {
-          activeNoteId = openTabIds[openTabIds.length - 1];
-        } else if (notes.length > 0) {
-          activeNoteId = notes[0].id;
-          openTabIds = [activeNoteId];
-        } else {
-          createNewNote();
-          return;
-        }
-      }
-
-      saveSettingsData();
-      renderTabs();
-      renderSidebar();
-      loadActiveNoteContent();
-    }
-
-    // --- EDITOR LOGIC & PREVIEW ENGINE ---
-
-    let editorMode = 'edit'; // 'edit' or 'preview'
-
-    function setEditorMode(mode) {
-      editorMode = mode;
-      
-      const toggleBtns = document.querySelectorAll('#editorModeToggle .toggle-btn');
-      toggleBtns.forEach(btn => {
-        if (btn.getAttribute('onclick').includes(mode)) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-      
-      const textarea = document.getElementById('editor');
-      const preview = document.getElementById('editorPreview');
-      const formattingBar = document.getElementById('formattingBar');
-      
-      if (mode === 'preview') {
-        textarea.style.display = 'none';
-        preview.style.display = 'block';
-        formattingBar.style.display = 'none';
-        
-        // Render preview content
-        preview.innerHTML = renderMarkdownToHtml(textarea.value);
-        hideLinkTooltip();
-      } else {
-        textarea.style.display = 'block';
-        preview.style.display = 'none';
-        formattingBar.style.display = 'flex';
-        textarea.focus();
-      }
+    function getNoteTimeFull(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      const day = date.getDate();
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      return `${day} ${month} ${year} at ${time}`;
     }
 
     function loadActiveNoteContent() {
       const activeNote = notes.find(n => n.id === activeNoteId);
       if (activeNote) {
         editor.innerHTML = activeNote.content || '';
+        const dateEl = document.getElementById('editorNoteDate');
+        if (dateEl) {
+          dateEl.textContent = getNoteTimeFull(activeNote.updatedAt);
+        }
       } else {
         editor.innerHTML = '';
-      }
-      
-      // Update preview if currently in preview mode
-      if (editorMode === 'preview') {
-        const preview = document.getElementById('editorPreview');
-        if (preview) {
-          preview.innerHTML = renderMarkdownToHtml(editor.innerHTML);
+        const dateEl = document.getElementById('editorNoteDate');
+        if (dateEl) {
+          dateEl.textContent = '';
         }
       }
-    }
-
-    function renderMarkdownToHtml(markdown) {
-      if (!markdown) {
-        return '<p style="color: var(--color-text-muted); font-style: italic; font-size: 13px;">No content yet. Click "Edit" to start writing.</p>';
-      }
-      
-      const lines = markdown.split('\n');
-      const html = [];
-      let inList = null; // 'ul', 'ol', or null
-      let inQuote = false;
-      let inTable = false;
-      let tableRows = [];
-      
-      function closeList() {
-        if (inList) {
-          html.push(`</${inList}>`);
-          inList = null;
-        }
-      }
-      
-      function closeQuote() {
-        if (inQuote) {
-          html.push(`</blockquote>`);
-          inQuote = false;
-        }
-      }
-      
-      function closeTable() {
-        if (inTable) {
-          html.push(renderHtmlTable(tableRows));
-          tableRows = [];
-          inTable = false;
-        }
-      }
-      
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmed = line.trim();
-        
-        // 1. Table Detection
-        if (trimmed.startsWith('|') && trimmed.includes('|', 1)) {
-          closeList();
-          closeQuote();
-          inTable = true;
-          tableRows.push(trimmed);
-          continue;
-        } else {
-          closeTable();
-        }
-        
-        // 2. Blockquote Detection
-        if (trimmed.startsWith('>')) {
-          closeList();
-          if (!inQuote) {
-            html.push(`<blockquote>`);
-            inQuote = true;
-          }
-          const quoteContent = trimmed.substring(1).trim();
-          html.push(`<p>${parseInlineMarkdown(quoteContent)}</p>`);
-          continue;
-        } else {
-          closeQuote();
-        }
-        
-        // 3. Header Detection
-        if (trimmed.startsWith('## ')) {
-          closeList();
-          html.push(`<h2>${parseInlineMarkdown(trimmed.substring(3))}</h2>`);
-          continue;
-        } else if (trimmed.startsWith('# ')) {
-          closeList();
-          html.push(`<h1>${parseInlineMarkdown(trimmed.substring(2))}</h1>`);
-          continue;
-        }
-        
-        // 4. Checklist Item Detection
-        if (trimmed.startsWith('- [ ] ') || trimmed.startsWith('- [x] ') || trimmed.startsWith('- [X] ')) {
-          if (inList !== 'ul') {
-            closeList();
-            html.push(`<ul class="checklist-container">`);
-            inList = 'ul';
-          }
-          const checked = trimmed.startsWith('- [ ] ') ? '' : 'checked';
-          const content = trimmed.substring(6);
-          html.push(`<li class="checklist-item"><input type="checkbox" ${checked} disabled /> <span>${parseInlineMarkdown(content)}</span></li>`);
-          continue;
-        }
-        
-        // 5. Unordered List Detection
-        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-          if (inList !== 'ul') {
-            closeList();
-            html.push(`<ul>`);
-            inList = 'ul';
-          }
-          html.push(`<li>${parseInlineMarkdown(trimmed.substring(2))}</li>`);
-          continue;
-        }
-        
-        // 6. Ordered List Detection
-        const olMatch = trimmed.match(/^(\d+)\.\s(.*)/);
-        if (olMatch) {
-          if (inList !== 'ol') {
-            closeList();
-            html.push(`<ol>`);
-            inList = 'ol';
-          }
-          html.push(`<li>${parseInlineMarkdown(olMatch[2])}</li>`);
-          continue;
-        }
-        
-        // Empty Line
-        if (trimmed === '') {
-          closeList();
-          html.push('<br/>');
-          continue;
-        }
-        
-        // Default Paragraph
-        closeList();
-        html.push(`<p>${parseInlineMarkdown(line)}</p>`);
-      }
-      
-      // Clean up any remaining open blocks
-      closeList();
-      closeQuote();
-      closeTable();
-      
-      return html.join('\n');
-    }
-
-    function renderHtmlTable(rows) {
-      if (rows.length === 0) return '';
-      
-      // Filter out standard divider rows like |---|---|
-      const filteredRows = rows.filter(row => {
-        const clean = row.replace(/[|:\s-]/g, '');
-        return clean.length > 0;
-      });
-      
-      if (filteredRows.length === 0) return '';
-      
-      let html = ['<div class="table-container"><table>'];
-      
-      // First row is the header
-      const headerCells = splitTableRow(filteredRows[0]);
-      html.push('<thead><tr>');
-      headerCells.forEach(cell => {
-        html.push(`<th>${parseInlineMarkdown(cell.trim())}</th>`);
-      });
-      html.push('</tr></thead>');
-      
-      // Remaining rows are the body
-      if (filteredRows.length > 1) {
-        html.push('<tbody>');
-        for (let r = 1; r < filteredRows.length; r++) {
-          html.push('<tr>');
-          const cells = splitTableRow(filteredRows[r]);
-          for (let c = 0; c < headerCells.length; c++) {
-            const val = cells[c] ? cells[c].trim() : '';
-            html.push(`<td>${parseInlineMarkdown(val)}</td>`);
-          }
-          html.push('</tr>');
-        }
-        html.push('</tbody>');
-      }
-      
-      html.push('</table></div>');
-      return html.join('');
-    }
-
-    function splitTableRow(rowText) {
-      let text = rowText.trim();
-      if (text.startsWith('|')) text = text.slice(1);
-      if (text.endsWith('|')) text = text.slice(0, -1);
-      return text.split('|');
-    }
-
-    function parseInlineMarkdown(text) {
-      let result = escapeHtml(text);
-      
-      // Inline Code: `code`
-      result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
-      
-      // Bold: **text**
-      result = result.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      
-      // Italic: *text*
-      result = result.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-      
-      // Strikethrough: ~~text~~
-      result = result.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-      
-      // Links: [Text](URL)
-      result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
-        let nodeId = '';
-        if (url.startsWith('figma://node-id=')) {
-          nodeId = decodeURIComponent(url.substring('figma://node-id='.length));
-        } else if (url.includes('figma.com') && url.includes('node-id=')) {
-          try {
-            const decodedUrl = url.replace(/&amp;/g, '&');
-            const urlObj = new URL(decodedUrl);
-            nodeId = urlObj.searchParams.get('node-id') || '';
-          } catch(e) {
-            nodeId = '';
-          }
-        }
-        
-        if (nodeId) {
-          return `<a href="#" class="frame-link" onclick="jumpToFrameDirect('${nodeId}', event)">${linkText}</a>`;
-        } else {
-          return `<a href="${url}" target="_blank">${linkText}</a>`;
-        }
-      });
-      
-      return result;
     }
 
     function jumpToFrameDirect(nodeId, event) {
@@ -2043,64 +1839,39 @@
         return;
       }
 
+      // Update sidebar header note count
+      const noteCountEl = document.getElementById('sidebarNoteCount');
+      if (noteCountEl) {
+        noteCountEl.textContent = `${notes.length} note${notes.length === 1 ? '' : 's'}`;
+      }
+
       filteredNotes.forEach(note => {
         const item = document.createElement('div');
         item.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
         item.onclick = () => selectNote(note.id);
         item.title = note.title;
 
-        const timeStr = getRelativeTime(note.updatedAt);
+        const timeStr = getNoteTimeShort(note.updatedAt);
+        const snippet = getNoteSnippet(note.content);
 
         item.innerHTML = `
           <div class="note-item-title">${escapeHtml(note.title)}</div>
-          <div class="note-item-time">${timeStr}</div>
+          <div class="note-item-meta" style="display: flex; gap: 8px; font-size: 11px; color: var(--color-text-muted); align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+            <span class="note-item-time" style="font-weight: 500; flex-shrink: 0;">${timeStr}</span>
+            <span class="note-item-snippet" style="opacity: 0.75; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${snippet}</span>
+          </div>
           <button class="note-item-delete" onclick="deleteNote('${note.id}', event)" title="Delete note">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
+            <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i>
           </button>
         `;
         notesList.appendChild(item);
       });
     }
 
-    function renderTabs() {
-      tabsContainer.innerHTML = '';
-      openTabIds.forEach(id => {
-        const note = notes.find(n => n.id === id);
-        if (!note) return;
-
-        const tab = document.createElement('div');
-        tab.className = `tab ${id === activeNoteId ? 'active' : ''}`;
-        tab.onclick = () => selectTab(id);
-
-        tab.innerHTML = `
-          <span class="tab-title">${escapeHtml(note.title)}</span>
-          <span class="tab-close" onclick="closeTab('${id}', event)">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </span>
-        `;
-        tabsContainer.appendChild(tab);
-      });
-    }
-
-    function updateActiveTabTitle(title) {
-      const activeTab = tabsContainer.querySelector('.tab.active .tab-title');
-      if (activeTab) {
-        activeTab.textContent = title;
-      }
-    }
-
     // --- TRANSFORMS & FORMATTING ACTIONS ---
 
     // Toggle popover states and close other open popovers
-    function togglePopover(menuId, event) {
+    function toggleCustomPopover(menuId, event) {
       if (event) event.stopPropagation();
       
       const targetMenu = document.getElementById(menuId);
@@ -2120,9 +1891,35 @@
     }
 
     // Close popovers if clicked anywhere outside
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.popover-container')) {
+        document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+      }
       closeAutocomplete();
+      
+      // Close AI popover if clicking outside
+      const aiPopover = document.getElementById('aiPopover');
+      const aiBtn = document.getElementById('aiBtn');
+      if (aiPopover && aiPopover.style.display === 'flex') {
+        if (!aiPopover.contains(e.target) && (!aiBtn || !aiBtn.contains(e.target))) {
+          aiPopover.style.display = 'none';
+        }
+      }
+
+      // Close Link popover if clicking outside
+      const linkPopover = document.getElementById('linkPopover');
+      if (linkPopover && linkPopover.style.display === 'flex') {
+        if (!linkPopover.contains(e.target) && !e.target.closest('#headerToolbar')) {
+          closeLinkPopover();
+        }
+      }
+    });
+
+    // Prevent popover menus from closing when clicking inside them
+    document.querySelectorAll('.popover-menu').forEach(menu => {
+      menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
     });
 
 
@@ -2134,15 +1931,30 @@
       const selectedText = range.toString();
       
       if (!selectedText) {
-        // Transform the entire editor text content
-        const text = editor.innerText;
-        let transformed = '';
-        if (type === 'uppercase') transformed = text.toUpperCase();
-        else if (type === 'lowercase') transformed = text.toLowerCase();
-        else if (type === 'titlecase') transformed = text.replace(/\b\w/g, c => c.toUpperCase());
-        else if (type === 'clean') transformed = text.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n\n');
-        
-        editor.innerText = transformed;
+        // Transform the entire editor text content but preserve HTML structure
+        const transformTextNodes = (node) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            let text = node.textContent;
+            let transformed = '';
+            if (type === 'uppercase') transformed = text.toUpperCase();
+            else if (type === 'lowercase') transformed = text.toLowerCase();
+            else if (type === 'titlecase') transformed = text.replace(/\b\w/g, c => c.toUpperCase());
+            else if (type === 'clean') transformed = text.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n\n');
+            node.textContent = transformed;
+          } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Skip interactive UI blocks in the editor
+            if (node.classList.contains('table-toolbar') || 
+                node.classList.contains('autocomplete-dropdown') || 
+                node.classList.contains('ai-popover') || 
+                node.tagName.toLowerCase() === 'button') {
+              return;
+            }
+            for (let i = 0; i < node.childNodes.length; i++) {
+              transformTextNodes(node.childNodes[i]);
+            }
+          }
+        };
+        transformTextNodes(editor);
       } else {
         let transformed = '';
         if (type === 'uppercase') transformed = selectedText.toUpperCase();
@@ -2352,43 +2164,6 @@
 
     // --- CLIPBOARD & WINDOW CONTROLS ---
 
-    function copyNoteContent() {
-      const text = editor.innerText;
-      if (!text.trim()) {
-        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Nothing to copy!', error: true } }, '*');
-        return;
-      }
-
-      navigator.clipboard.writeText(text).then(() => {
-        const copyBtn = document.getElementById('copyBtn');
-        const copyText = document.getElementById('copyText');
-        const copyIcon = document.getElementById('copyIcon');
-        
-        copyBtn.classList.add('copied');
-        copyText.textContent = 'Copied!';
-        copyIcon.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-        `;
-        
-        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Copied to clipboard!' } }, '*');
-
-        setTimeout(() => {
-          copyBtn.classList.remove('copied');
-          copyText.textContent = 'Copy';
-          copyIcon.innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-          `;
-        }, 2000);
-      }).catch(err => {
-        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Copy failed: ' + err, error: true } }, '*');
-      });
-    }
-
     function toggleWindowSize() {
       isWindowLarge = !isWindowLarge;
       const resizeBtn = document.getElementById('resizeBtn');
@@ -2399,18 +2174,10 @@
       if (isWindowLarge) {
         width = 840;
         height = 620;
-        resizeBtn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
-          </svg>
-        `;
+        resizeBtn.innerHTML = `<i class="fa-solid fa-compress"></i>`;
         resizeBtn.title = "Collapse window size";
       } else {
-        resizeBtn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-          </svg>
-        `;
+        resizeBtn.innerHTML = `<i class="fa-solid fa-expand"></i>`;
         resizeBtn.title = "Expand window size";
       }
       
@@ -2429,9 +2196,309 @@
         sidebarCollapsed: isSidebarCollapsed,
         windowLarge: isWindowLarge,
         openTabs: openTabIds,
-        activeNoteId: activeNoteId
+        activeNoteId: activeNoteId,
+        theme: currentTheme,
+        geminiApiKey: geminiApiKey
       };
       parent.postMessage({ pluginMessage: { type: 'saveSettings', settings } }, '*');
+    }
+
+    function applyThemeClass(themeName) {
+      document.body.classList.remove('theme-cream', 'theme-midnight', 'theme-nordic');
+      document.body.classList.add('theme-' + themeName);
+    }
+
+    function changeTheme(themeName) {
+      currentTheme = themeName;
+      applyThemeClass(themeName);
+      saveSettingsData();
+    }
+
+    function changeGeminiApiKey(key) {
+      geminiApiKey = key.trim();
+      saveSettingsData();
+    }
+
+
+
+    // --- GEMINI AI COPILOT ---
+
+    function toggleAiPopover(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      const popover = document.getElementById('aiPopover');
+      if (popover.style.display === 'flex') {
+        popover.style.display = 'none';
+        return;
+      }
+      
+      // Close other popovers
+      document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+      closeAutocomplete();
+      
+      showAiPopoverAtSelection();
+    }
+
+    function showAiPopoverAtSelection() {
+      const popover = document.getElementById('aiPopover');
+      const selection = window.getSelection();
+      let rect = null;
+      
+      savedAiRange = null;
+      if (selection.rangeCount) {
+        const range = selection.getRangeAt(0);
+        let node = range.commonAncestorContainer;
+        while (node && node !== editor) {
+          node = node.parentNode;
+        }
+        if (node === editor) {
+          savedAiRange = range.cloneRange();
+          rect = range.getBoundingClientRect();
+        }
+      }
+      
+      const editorRect = editor.getBoundingClientRect();
+      let left = 0;
+      let top = 0;
+      
+      if (rect && rect.width > 0 && rect.height > 0) {
+        const x = rect.left - editorRect.left + editor.scrollLeft;
+        const y = rect.bottom - editorRect.top + editor.scrollTop + 4;
+        left = Math.min(x, editor.clientWidth - 210);
+        top = y;
+      } else {
+        const formattingBar = document.getElementById('formattingBar');
+        if (formattingBar && formattingBar.style.display !== 'none') {
+          const barRect = formattingBar.getBoundingClientRect();
+          const x = barRect.left - editorRect.left + (barRect.width / 2) - 100;
+          const y = barRect.top - editorRect.top - 200;
+          left = Math.max(10, Math.min(x, editor.clientWidth - 210));
+          top = y;
+        } else {
+          left = (editor.clientWidth - 200) / 2;
+          top = 100;
+        }
+      }
+      
+      popover.style.left = `${left}px`;
+      popover.style.top = `${top}px`;
+      popover.style.display = 'flex';
+      
+      const input = document.getElementById('aiCustomPrompt');
+      if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 50);
+      }
+    }
+
+    async function runAiAction(actionType) {
+      if (!geminiApiKey) {
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Please set your Gemini API Key in Settings.', error: true } }, '*');
+        toggleCustomPopover('settingsMenu');
+        return;
+      }
+
+      const selection = window.getSelection();
+      let range = savedAiRange;
+      
+      // If we have an active browser selection, prioritize it
+      if (selection.rangeCount) {
+        const activeRange = selection.getRangeAt(0);
+        let node = activeRange.commonAncestorContainer;
+        while (node && node !== editor) {
+          node = node.parentNode;
+        }
+        if (node === editor && activeRange.toString().trim().length > 0) {
+          range = activeRange;
+        }
+      }
+
+      let selectedText = '';
+      if (range) {
+        selectedText = range.toString().trim();
+      }
+
+      const isWholeNote = !selectedText;
+      const textToProcess = selectedText || editor.innerText.trim();
+      if (!textToProcess) {
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'No text to process. Please enter some text.', error: true } }, '*');
+        resetAiPopoverUi();
+        document.getElementById('aiPopover').style.display = 'none';
+        return;
+      }
+
+      const customPromptInput = document.getElementById('aiCustomPrompt');
+      const customPromptText = customPromptInput ? customPromptInput.value.trim() : '';
+
+      if (actionType === 'custom' && !customPromptText) {
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'Please enter a prompt.', error: true } }, '*');
+        return;
+      }
+
+      // Show loading state
+      const loadingEl = document.getElementById('aiPopoverLoading');
+      const optionsEl = popoverOptionsEl();
+      const customEl = popoverCustomEl();
+      
+      if (optionsEl) optionsEl.style.display = 'none';
+      if (customEl) customEl.style.display = 'none';
+      if (loadingEl) loadingEl.style.display = 'flex';
+
+      let systemInstruction = "You are an expert editor AI writing assistant.";
+      let userPrompt = "";
+
+      switch (actionType) {
+        case 'improve':
+          systemInstruction = "You are an expert editor. Rewrite the following text to improve clarity, grammar, style, and flow. Retain original html tags if any, otherwise return plain text. Return ONLY the improved text, without any markdown formatting wrappers or conversational preamble.";
+          userPrompt = textToProcess;
+          break;
+        case 'summarize':
+          systemInstruction = "You are an expert summarizer. Summarize the following text concisely. Highlight key points. Return ONLY the summary, without any markdown formatting wrappers or conversational preamble.";
+          userPrompt = textToProcess;
+          break;
+        case 'table':
+          systemInstruction = "You are a data formatting specialist. Convert the following list or raw text data into an HTML table structure. Format it using standard table tags ONLY: <thead><tr><th>Header 1</th>...</tr></thead> and <tbody><tr><td>Cell 1</td>...</tr></tbody>. Do NOT output <table> or </table> or markdown wrappers. Use high-quality column titles. Return ONLY the table HTML structure.";
+          userPrompt = textToProcess;
+          break;
+        case 'casual':
+          systemInstruction = "Rewrite the following text in a friendly, casual, and warm tone. Return ONLY the casual text, without any markdown formatting wrappers or conversational preamble.";
+          userPrompt = textToProcess;
+          break;
+        case 'professional':
+          systemInstruction = "Rewrite the following text in a polished, professional, and clear business tone. Return ONLY the professional text, without any markdown formatting wrappers or conversational preamble.";
+          userPrompt = textToProcess;
+          break;
+        case 'custom':
+          systemInstruction = `You are a helpful AI writing assistant. The user wants you to do the following: "${customPromptText}". Process the text provided and return ONLY the resulting text, without any conversational preamble or markdown code block backticks unless the request is explicitly to write code.`;
+          userPrompt = textToProcess;
+          break;
+      }
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: systemInstruction + "\n\nText to process:\n" + userPrompt }]
+            }],
+            generationConfig: {
+              temperature: 0.2
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const errMsg = errorData.error?.message || `HTTP error ${response.status}`;
+          throw new Error(errMsg);
+        }
+
+        const data = await response.json();
+        let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!resultText) {
+          throw new Error("No response content from Gemini.");
+        }
+
+        resultText = resultText.trim();
+        if (resultText.startsWith('```html')) {
+          resultText = resultText.replace(/^```html/, '').replace(/```$/, '').trim();
+        } else if (resultText.startsWith('```')) {
+          resultText = resultText.replace(/^```[a-zA-Z]*/, '').replace(/```$/, '').trim();
+        }
+
+        if (range) {
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+
+        if (actionType === 'table') {
+          let tableHtml = `<div class="table-container" contenteditable="false">` +
+                          `<div class="table-toolbar">` +
+                          `<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, 'up')" title="Move Up"><i class="fa-solid fa-arrow-up" style="margin-right: 4px;"></i>Move Up</button>` +
+                          `<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, 'down')" title="Move Down"><i class="fa-solid fa-arrow-down" style="margin-right: 4px;"></i>Move Down</button>` +
+                          `<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableRow(this)" title="Add Row Below"><i class="fa-solid fa-plus" style="margin-right: 4px;"></i>Row</button>` +
+                          `<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableCol(this)" title="Add Column Right"><i class="fa-solid fa-plus" style="margin-right: 4px;"></i>Col</button>` +
+                          `<button class="table-tool-btn delete" onmousedown="event.preventDefault(); deleteTable(this)" title="Delete Table"><i class="fa-solid fa-trash" style="margin-right: 4px;"></i>Delete</button>` +
+                          `</div>` +
+                          `<div class="table-scroll-wrapper" contenteditable="true">` +
+                          `<table class="editor-table">${resultText}</table>` +
+                          `</div></div><p><br></p>`;
+          
+          if (!isWholeNote && range) {
+            range.deleteContents();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = tableHtml;
+            const frag = document.createDocumentFragment();
+            let child;
+            while (child = tempDiv.firstChild) {
+              frag.appendChild(child);
+            }
+            range.insertNode(frag);
+          } else {
+            editor.innerHTML += tableHtml;
+          }
+        } else {
+          const formattedResult = resultText.replace(/\n/g, '<br>');
+          if (!isWholeNote && range) {
+            range.deleteContents();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = formattedResult;
+            const frag = document.createDocumentFragment();
+            let child;
+            while (child = tempDiv.firstChild) {
+              frag.appendChild(child);
+            }
+            range.insertNode(frag);
+          } else {
+            editor.innerHTML = formattedResult;
+          }
+        }
+
+        handleEditorInput();
+        parent.postMessage({ pluginMessage: { type: 'notify', message: 'AI processing complete!' } }, '*');
+
+      } catch (err) {
+        console.error("Gemini API Error:", err);
+        parent.postMessage({ pluginMessage: { type: 'notify', message: `AI Error: ${err.message}`, error: true } }, '*');
+      } finally {
+        resetAiPopoverUi();
+        document.getElementById('aiPopover').style.display = 'none';
+      }
+    }
+
+    function handleAiCustomPromptKey(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        runAiAction('custom');
+      }
+    }
+
+    function resetAiPopoverUi() {
+      const loadingEl = document.getElementById('aiPopoverLoading');
+      const optionsEl = popoverOptionsEl();
+      const customEl = popoverCustomEl();
+      
+      if (optionsEl) optionsEl.style.display = 'flex';
+      if (customEl) customEl.style.display = 'flex';
+      if (loadingEl) loadingEl.style.display = 'none';
+      
+      const customPromptInput = document.getElementById('aiCustomPrompt');
+      if (customPromptInput) customPromptInput.value = '';
+    }
+
+    function popoverOptionsEl() {
+      return document.querySelector('.ai-popover-options');
+    }
+
+    function popoverCustomEl() {
+      return document.querySelector('.ai-popover-custom');
     }
 
     // --- OTHER HELPERS ---
@@ -2474,6 +2541,49 @@
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
       }
+    }
+
+    function getNoteSnippet(content) {
+      if (!content) return 'No additional text';
+      const temp = document.createElement('div');
+      temp.innerHTML = content;
+      
+      // Get all table toolbars or elements we want to ignore and remove them
+      const toolbars = temp.querySelectorAll('.table-toolbar');
+      toolbars.forEach(tb => tb.remove());
+      
+      let text = temp.innerText || temp.textContent || '';
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      lines.shift(); // Remove the first line (since it is the title)
+      const bodyText = lines.join(' ').trim();
+      if (!bodyText) return 'No additional text';
+      return bodyText.length > 55 ? bodyText.substring(0, 55) + '...' : bodyText;
+    }
+
+    function getNoteTimeShort(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      const now = new Date();
+      
+      if (date.toDateString() === now.toDateString()) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      if (date.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
+      }
+      
+      const diffMs = now - date;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays < 7) {
+        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        return weekdays[date.getDay()];
+      }
+      
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
     }
     // --- AUTOCOMPLETE & FRAME REFERENCES HELPERS ---
 
@@ -2526,7 +2636,7 @@
       filteredFrames.forEach((frame, idx) => {
         const btn = document.createElement('button');
         btn.className = `autocomplete-item ${idx === selectedAutocompleteIndex ? 'selected' : ''}`;
-        btn.innerHTML = `🖼️ ${escapeHtml(frame.name)}`;
+        btn.innerHTML = `<i class="fa-regular fa-image" style="margin-right: 6px; width: 14px; text-align: center;"></i>${escapeHtml(frame.name)}`;
         btn.onclick = (e) => {
           e.stopPropagation();
           insertAutocompleteFrame(frame.name);
@@ -2608,7 +2718,7 @@
         btn.className = 'popover-item';
         btn.style.paddingLeft = '12px';
         btn.innerHTML = `
-          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ${escapeHtml(item.name)}</span>
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><i class="fa-solid fa-location-dot" style="margin-right: 6px; color: var(--color-accent); width: 12px; text-align: center;"></i>${escapeHtml(item.name)}</span>
           <span class="popover-shortcut">Jump</span>
         `;
         btn.onclick = (e) => {
@@ -2672,6 +2782,24 @@
         const caretOffset = range.startOffset;
         const textBeforeCaret = text.substring(0, caretOffset);
 
+        // Check if user typed "/ai" command
+        if (textBeforeCaret.endsWith('/ai')) {
+          const idx = textBeforeCaret.length - 3;
+          const charBefore = idx > 0 ? textBeforeCaret.charAt(idx - 1) : ' ';
+          if ([' ', '\n', '\u00A0', '\u200b'].includes(charBefore)) {
+            // Delete the "/ai" text
+            const startOfAi = caretOffset - 3;
+            range.setStart(container, startOfAi);
+            range.setEnd(container, caretOffset);
+            range.deleteContents();
+            
+            // Toggle/show the AI popover
+            closeAutocomplete();
+            showAiPopoverAtSelection();
+            return;
+          }
+        }
+
         // Find triggers
         const lastAt = textBeforeCaret.lastIndexOf('@');
         const lastSlash = textBeforeCaret.lastIndexOf('/');
@@ -2708,9 +2836,27 @@
       checkLinkClick();
     });
 
-    editor.addEventListener('click', () => {
+    editor.addEventListener('click', (e) => {
       closeAutocomplete();
       checkLinkClick();
+      
+      // Intercept link clicks inside contenteditable
+      let target = e.target;
+      while (target && target !== editor) {
+        if (target.nodeType === Node.ELEMENT_NODE && target.tagName.toLowerCase() === 'a') {
+          if (target.classList.contains('frame-link') || target.dataset.nodeId) {
+            const nodeId = target.dataset.nodeId || getFigmaNodeIdFromUrl(target.getAttribute('href') || '');
+            if (nodeId) {
+              e.preventDefault();
+              e.stopPropagation();
+              jumpToFrameDirect(nodeId);
+              return;
+            }
+          }
+          break;
+        }
+        target = target.parentNode;
+      }
     });
 
     editor.addEventListener('scroll', () => {
@@ -2745,99 +2891,8 @@
           selection.addRange(range);
         }
       } else if (type === 'link') {
-        const selection = window.getSelection();
-        if (selection.rangeCount) {
-          const range = selection.getRangeAt(0).cloneRange();
-          
-          // Check if selection is inside an existing link
-          let parentLink = null;
-          let node = range.commonAncestorContainer;
-          while (node && node !== editor) {
-            if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'a') {
-              parentLink = node;
-              break;
-            }
-            node = node.parentNode;
-          }
-          
-          let urlPrompt = 'https://';
-          let defaultText = '';
-          
-          if (parentLink) {
-            urlPrompt = parentLink.getAttribute('data-url') || parentLink.getAttribute('href') || parentLink.href;
-            defaultText = parentLink.textContent;
-          } else {
-            defaultText = range.toString();
-            if (defaultText.startsWith('http')) {
-              urlPrompt = defaultText;
-            }
-          }
-          
-          const url = prompt('Enter URL (leave empty to remove link):', urlPrompt);
-          if (url === null) return; // User clicked Cancel
-          
-          // Restore the selection
-          selection.removeAllRanges();
-          selection.addRange(range);
-          
-          if (parentLink) {
-            if (url.trim() === '') {
-              // Remove the link (unwrap)
-              const textNode = document.createTextNode(parentLink.textContent);
-              parentLink.parentNode.replaceChild(textNode, parentLink);
-            } else {
-              // Update existing link
-              const targetUrl = url.trim();
-              parentLink.setAttribute('href', targetUrl);
-              parentLink.dataset.url = targetUrl;
-              
-              // If it's a figma node link, set class/nodeId
-              if (targetUrl.startsWith('figma://node-id=') || targetUrl.includes('node-id=')) {
-                parentLink.className = 'frame-link';
-                const nodeId = getFigmaNodeIdFromUrl(targetUrl);
-                if (nodeId) {
-                  parentLink.dataset.nodeId = nodeId;
-                  parentLink.setAttribute('onclick', `jumpToFrameDirect('${nodeId}', event)`);
-                }
-              } else {
-                parentLink.className = '';
-                parentLink.removeAttribute('onclick');
-                parentLink.removeAttribute('data-node-id');
-                parentLink.target = '_blank';
-              }
-            }
-          } else {
-            // Create a new link
-            if (url.trim() === '') return;
-            const targetUrl = url.trim();
-            
-            const link = document.createElement('a');
-            link.href = targetUrl;
-            link.dataset.url = targetUrl;
-            link.textContent = defaultText || 'Link';
-            
-            if (targetUrl.startsWith('figma://node-id=') || targetUrl.includes('node-id=')) {
-              link.className = 'frame-link';
-              const nodeId = getFigmaNodeIdFromUrl(targetUrl);
-              if (nodeId) {
-                link.dataset.nodeId = nodeId;
-                link.setAttribute('onclick', `jumpToFrameDirect('${nodeId}', event)`);
-              }
-            } else {
-              link.target = '_blank';
-            }
-            
-            range.deleteContents();
-            range.insertNode(link);
-            
-            // Move cursor after the link
-            const newRange = document.createRange();
-            newRange.setStartAfter(link);
-            newRange.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
-          }
-        }
+        showLinkPopoverAtSelection();
+      }
       } else if (type === 'bullet') {
         document.execCommand('insertUnorderedList', false, null);
       } else if (type === 'number') {
@@ -2858,8 +2913,196 @@
       handleEditorInput();
     }
 
-    // Link Helper Tooltip methods
+    // Link Helper Tooltip and Custom Popover methods
     let currentActiveLink = null;
+    let savedLinkRange = null;
+
+    function showLinkPopoverAtSelection() {
+      const popover = document.getElementById('linkPopover');
+      const selection = window.getSelection();
+      let rect = null;
+      
+      savedLinkRange = null;
+      let parentLink = null;
+      
+      if (selection.rangeCount) {
+        const range = selection.getRangeAt(0);
+        let node = range.commonAncestorContainer;
+        while (node && node !== editor) {
+          if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'a') {
+            parentLink = node;
+            break;
+          }
+          node = node.parentNode;
+        }
+        
+        let target = range.commonAncestorContainer;
+        while (target && target !== editor) {
+          target = target.parentNode;
+        }
+        if (target === editor) {
+          savedLinkRange = range.cloneRange();
+          rect = range.getBoundingClientRect();
+        }
+      }
+      
+      if (!savedLinkRange && parentLink) {
+        savedLinkRange = document.createRange();
+        savedLinkRange.selectNode(parentLink);
+      }
+      
+      if (!savedLinkRange) {
+        return;
+      }
+      
+      const containerRect = editor.parentNode.getBoundingClientRect();
+      let left = 0;
+      let top = 0;
+      
+      if (rect && rect.width > 0 && rect.height > 0) {
+        const x = rect.left - containerRect.left;
+        const y = rect.bottom - containerRect.top + 4;
+        left = Math.min(x, editor.clientWidth - 250);
+        top = y;
+      } else if (parentLink) {
+        const prect = parentLink.getBoundingClientRect();
+        const x = prect.left - containerRect.left;
+        const y = prect.bottom - containerRect.top + 4;
+        left = Math.min(x, editor.clientWidth - 250);
+        top = y;
+      } else {
+        left = (editor.clientWidth - 240) / 2;
+        top = 100;
+      }
+      
+      popover.style.left = `${Math.max(10, left)}px`;
+      popover.style.top = `${top}px`;
+      popover.style.display = 'flex';
+      
+      const urlInput = document.getElementById('linkPopoverUrl');
+      const textInput = document.getElementById('linkPopoverText');
+      const removeBtn = document.getElementById('linkPopoverRemoveBtn');
+      
+      if (parentLink) {
+        urlInput.value = parentLink.getAttribute('data-url') || parentLink.getAttribute('href') || '';
+        textInput.value = parentLink.textContent;
+        removeBtn.style.display = 'inline-block';
+      } else {
+        urlInput.value = '';
+        textInput.value = savedLinkRange.toString();
+        removeBtn.style.display = 'none';
+      }
+      
+      urlInput.focus();
+    }
+
+    function closeLinkPopover() {
+      const popover = document.getElementById('linkPopover');
+      if (popover) {
+        popover.style.display = 'none';
+      }
+      savedLinkRange = null;
+    }
+
+    function applyLinkPopover() {
+      if (!savedLinkRange) return;
+      
+      const urlInput = document.getElementById('linkPopoverUrl');
+      const textInput = document.getElementById('linkPopoverText');
+      const url = urlInput.value.trim();
+      const text = textInput.value.trim();
+      
+      if (!url) {
+        removeLinkPopover();
+        return;
+      }
+      
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(savedLinkRange);
+      
+      let parentLink = null;
+      let node = savedLinkRange.commonAncestorContainer;
+      while (node && node !== editor) {
+        if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'a') {
+          parentLink = node;
+          break;
+        }
+        node = node.parentNode;
+      }
+      
+      const targetUrl = formatUrl(url);
+      
+      if (parentLink) {
+        // Update existing link
+        parentLink.setAttribute('href', targetUrl);
+        parentLink.dataset.url = targetUrl;
+        parentLink.textContent = text || 'Link';
+        
+        if (targetUrl.startsWith('figma://node-id=') || targetUrl.includes('node-id=')) {
+          parentLink.className = 'frame-link';
+          const nodeId = getFigmaNodeIdFromUrl(targetUrl);
+          if (nodeId) {
+            parentLink.dataset.nodeId = nodeId;
+            parentLink.setAttribute('onclick', `jumpToFrameDirect('${nodeId}', event)`);
+          }
+        } else {
+          parentLink.className = '';
+          parentLink.removeAttribute('onclick');
+          parentLink.removeAttribute('data-node-id');
+          parentLink.target = '_blank';
+        }
+      } else {
+        // Create new link
+        const link = document.createElement('a');
+        link.href = targetUrl;
+        link.dataset.url = targetUrl;
+        link.textContent = text || 'Link';
+        
+        if (targetUrl.startsWith('figma://node-id=') || targetUrl.includes('node-id=')) {
+          link.className = 'frame-link';
+          const nodeId = getFigmaNodeIdFromUrl(targetUrl);
+          if (nodeId) {
+            link.dataset.nodeId = nodeId;
+            link.setAttribute('onclick', `jumpToFrameDirect('${nodeId}', event)`);
+          }
+        } else {
+          link.target = '_blank';
+        }
+        
+        savedLinkRange.deleteContents();
+        savedLinkRange.insertNode(link);
+      }
+      
+      closeLinkPopover();
+      handleEditorInput();
+    }
+
+    function removeLinkPopover() {
+      if (!savedLinkRange) return;
+      
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(savedLinkRange);
+      
+      let parentLink = null;
+      let node = savedLinkRange.commonAncestorContainer;
+      while (node && node !== editor) {
+        if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'a') {
+          parentLink = node;
+          break;
+        }
+        node = node.parentNode;
+      }
+      
+      if (parentLink) {
+        const textNode = document.createTextNode(parentLink.textContent);
+        parentLink.parentNode.replaceChild(textNode, parentLink);
+      }
+      
+      closeLinkPopover();
+      handleEditorInput();
+    }
 
     function getFigmaNodeIdFromUrl(url) {
       if (url.startsWith('figma://node-id=')) {
@@ -2871,6 +3114,15 @@
       } catch (e) {
         return '';
       }
+    }
+
+    function formatUrl(url) {
+      if (!url) return '';
+      let trimmed = url.trim();
+      if (!/^https?:\/\//i.test(trimmed) && !/^figma:\/\//i.test(trimmed) && trimmed !== '#' && !trimmed.startsWith('figma:')) {
+        trimmed = 'https://' + trimmed;
+      }
+      return trimmed;
     }
 
     function checkLinkClick() {
@@ -2895,10 +3147,10 @@
       if (anchor) {
         currentActiveLink = anchor;
         const rect = anchor.getBoundingClientRect();
-        const editorRect = editor.getBoundingClientRect();
-        
+        const containerRect = editor.parentNode.getBoundingClientRect();
         const nodeId = anchor.dataset.nodeId || getFigmaNodeIdFromUrl(anchor.getAttribute('href') || '');
-        const url = anchor.getAttribute('href') || '';
+        const rawUrl = anchor.dataset.url || anchor.getAttribute('href') || '';
+        const url = formatUrl(rawUrl);
         
         const jumpBtn = document.getElementById('tooltipJumpBtn');
         const openBtn = document.getElementById('tooltipOpenBtn');
@@ -2914,17 +3166,20 @@
           jumpBtn.style.display = 'none';
         }
 
-        openBtn.onclick = (e) => {
-          e.stopPropagation();
-          if (url && !url.startsWith('#')) {
-            window.open(url, '_blank');
-          }
-          hideLinkTooltip();
-        };
+        if (url && !url.startsWith('#')) {
+          openBtn.style.display = 'flex';
+          openBtn.setAttribute('href', url);
+          openBtn.onclick = () => {
+            hideLinkTooltip();
+          };
+        } else {
+          openBtn.style.display = 'none';
+          openBtn.removeAttribute('href');
+        }
 
         const linkTooltip = document.getElementById('linkTooltip');
-        const x = rect.left - editorRect.left + editor.scrollLeft;
-        const y = rect.top - editorRect.top + editor.scrollTop - 36;
+        const x = rect.left - containerRect.left;
+        const y = (rect.top - containerRect.top - 36 < 0) ? (rect.bottom - containerRect.top + 4) : (rect.top - containerRect.top - 36);
         
         linkTooltip.style.left = `${Math.min(x, editor.clientWidth - 180)}px`;
         linkTooltip.style.top = `${y}px`;
@@ -2936,7 +3191,10 @@
 
     function hideLinkTooltip() {
       currentActiveLink = null;
-      document.getElementById('linkTooltip').style.display = 'none';
+      const tooltip = document.getElementById('linkTooltip');
+      if (tooltip) {
+        tooltip.style.display = 'none';
+      }
     }
 
     // --- ATTACHMENT LOGIC ---
@@ -3169,8 +3427,9 @@
         const containerRect = document.querySelector('.editor-container').getBoundingClientRect();
         
         const leftOffset = (btnRect.left + btnRect.width / 2) - containerRect.left;
-        wizard.style.left = `${leftOffset}px`;
-        wizard.style.bottom = `${containerRect.bottom - btnRect.top + 8}px`;
+        wizard.style.left = `${Math.max(10, Math.min(leftOffset - 85, containerRect.width - 180))}px`;
+        wizard.style.bottom = 'auto';
+        wizard.style.top = `${btnRect.bottom - containerRect.top + 8}px`;
         
         updateTableWizardHighlight(3, 2);
         
@@ -3197,11 +3456,11 @@
       
       // Toolbar
       html += '<div class="table-toolbar">';
-      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, \'up\')" title="Move Up">⬆️ Move Up</button>';
-      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, \'down\')" title="Move Down">⬇️ Move Down</button>';
-      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableRow(this)" title="Add Row Below">➕ Row</button>';
-      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableCol(this)" title="Add Column Right">➕ Col</button>';
-      html += '<button class="table-tool-btn delete" onmousedown="event.preventDefault(); deleteTable(this)" title="Delete Table">🗑️ Delete</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, \'up\')" title="Move Up"><i class="fa-solid fa-arrow-up" style="margin-right: 4px;"></i>Move Up</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); moveTable(this, \'down\')" title="Move Down"><i class="fa-solid fa-arrow-down" style="margin-right: 4px;"></i>Move Down</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableRow(this)" title="Add Row Below"><i class="fa-solid fa-plus" style="margin-right: 4px;"></i>Row</button>';
+      html += '<button class="table-tool-btn" onmousedown="event.preventDefault(); addTableCol(this)" title="Add Column Right"><i class="fa-solid fa-plus" style="margin-right: 4px;"></i>Col</button>';
+      html += '<button class="table-tool-btn delete" onmousedown="event.preventDefault(); deleteTable(this)" title="Delete Table"><i class="fa-solid fa-trash" style="margin-right: 4px;"></i>Delete</button>';
       html += '</div>';
       
       // Scroll Wrapper
