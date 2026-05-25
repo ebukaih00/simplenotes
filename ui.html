@@ -682,8 +682,16 @@
       align-items: center;
     }
 
+    .sidebar-collapsed .sidebar-header {
+      display: none;
+    }
+
     .sidebar-collapsed .header-left {
       width: 42px;
+    }
+
+    .sidebar-collapsed .app-title {
+      display: none;
     }
 
     .sidebar-collapsed .sidebar-action-btn {
@@ -708,6 +716,7 @@
       position: static;
       transform: none;
       cursor: pointer;
+      pointer-events: auto; /* Allow clicking to expand sidebar */
       width: 32px;
       height: 32px;
       border-radius: 8px;
@@ -721,6 +730,11 @@
       background-color: var(--bg-hover);
     }
 
+    .sidebar-collapsed .notes-list::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
+
     .sidebar-collapsed .note-item {
       align-items: center;
       justify-content: center;
@@ -728,7 +742,7 @@
     }
 
     .sidebar-collapsed .note-item-title,
-    .sidebar-collapsed .note-item-time,
+    .sidebar-collapsed .note-item-meta,
     .sidebar-collapsed .note-item-delete {
       display: none;
     }
@@ -752,7 +766,7 @@
     }
 
     .sidebar-collapsed .popover-menu {
-      left: 48px;
+      left: 50px;
       bottom: 0;
     }
 
